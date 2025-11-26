@@ -1,18 +1,15 @@
-import { Route, Routes } from 'react-router-dom';
-import MainPage from './pages/MainPage';
-import BuyPage from './pages/BuyPage';
-import LimitPage from './pages/LimitPage';
-import SwapPage from './pages/SwapPage';
-import SellPage from './pages/SellPage';
-import Header from './components/Header';
+import { Route, Routes } from 'react-router-dom'
+import MainPage from './pages/MainPage'
+import BuyPage from './pages/BuyPage'
+import LimitPage from './pages/LimitPage'
+import SwapPage from './pages/SwapPage'
+import SellPage from './pages/SellPage'
 
-import './App.css';
+import './App.css'
 
 function App() {
     return (
         <>
-            <Header />
-
             <Routes>
                 <Route path='/' element={<MainPage />} />
                 <Route path='/swap' element={<SwapPage />} />
@@ -21,8 +18,8 @@ function App() {
                 <Route path='/sell' element={<SellPage />} />
             </Routes>
         </>
-    );
+    )
 }
 
-export default App;
+export default App
 
