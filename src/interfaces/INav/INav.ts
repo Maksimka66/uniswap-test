@@ -1,5 +1,5 @@
 export interface ILinks {
-    id: number;
+    id: string;
     name: string;
     to: string;
 }
@@ -7,3 +7,4 @@ export interface ILinks {
 export interface INav {
     links: ILinks[];
 }
+
