@@ -1,23 +1,28 @@
-import { useState } from 'react';
-import clsx from 'clsx';
-import ArrowDownIcon from '../../icons/ArrowDownIcon';
-import SettingsIcon from '../../icons/SettingsIcon';
-import InputWrapper from '../../shared/InputWrapper';
-import Layout from '../../shared/Layout';
-import DropDownIcon from '../../icons/DropDownIcon';
+import { useState } from 'react'
+import { useSelector } from 'react-redux'
+import clsx from 'clsx'
+import ArrowDownIcon from '../../icons/ArrowDownIcon'
+import SettingsIcon from '../../icons/SettingsIcon'
+import InputWrapper from '../../shared/InputWrapper'
+import Layout from '../../shared/Layout'
+import DropDownIcon from '../../icons/DropDownIcon'
+import ConnectButton from '../../shared/ConnectButton'
+import { selectKey } from '../../store/slice'
 
 export default function Exchanger() {
-    const [direction, setDirection] = useState('');
-    const [fieldFrom, setFieldFrom] = useState('0.0');
-    const [fieldTo, setFieldTo] = useState('0.0');
+    const [direction, setDirection] = useState('')
+    const [fieldFrom, setFieldFrom] = useState('0.0')
+    const [fieldTo, setFieldTo] = useState('0.0')
+
+    const key = useSelector(selectKey)
 
     const handleClick = () => {
         if (!direction) {
-            setDirection('flex-col-reverse');
+            setDirection('flex-col-reverse')
         } else {
-            setDirection('');
+            setDirection('')
         }
-    };
+    }
 
     return (
         <Layout>
@@ -59,9 +64,16 @@ export default function Exchanger() {
                     }
                 />
             </div>
-            <button className='w-full py-[16px] bg-[#FFF1F2] rounded-[10px] font-dm font-medium text-[#F43F5E] text-[18px] leading-[24px]'>
-                Connect a wallet
-            </button>
+            {key ? (
+                <button className='rounded-[10px] font-medium font-dm w-full py-[16px] bg-[#FFF1F2] text-[#F43F5E] text-[18px] leading-[24px]'>
+                    Add funds to swap
+                </button>
+            ) : (
+                <ConnectButton className='w-full py-[16px] bg-[#FFF1F2] text-[#F43F5E] text-[18px] leading-[24px]'>
+                    Connect a wallet
+                </ConnectButton>
+            )}
         </Layout>
-    );
+    )
 }
+

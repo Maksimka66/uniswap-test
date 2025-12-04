@@ -4,7 +4,9 @@ export default function SellPage() {
     return (
         <>
             <Header />
-            <div>Sell</div>
+            <main className='flex items-center bg-main h-screen'>
+                <div>Sell</div>
+            </main>
         </>
     )
 }
