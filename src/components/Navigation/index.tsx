@@ -6,7 +6,7 @@ export default function Navigation({ links }: INav) {
     const { pathname } = useLocation()
 
     return (
-        <ul className='flex gap-4'>
+        <ul className='flex gap-4 mx-auto'>
             {links.map((link: ILinks) => (
                 <li key={link.id}>
                     <NavLink
