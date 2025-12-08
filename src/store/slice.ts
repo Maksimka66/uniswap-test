@@ -2,15 +2,17 @@ import { createSlice } from '@reduxjs/toolkit'
 
 const initialState = {
     key: '',
-    isLoading: false
+    isLoading: false,
+    isModalOpen: false
 }
 
 const keySlice = createSlice({
     name: 'key',
     initialState,
     selectors: {
-        selectKey: (state) => state.key,
-        selectIsLoading: (state) => state.isLoading
+        selectAddress: (state) => state.key,
+        selectIsLoading: (state) => state.isLoading,
+        selectIsModalOpen: (state) => state.isModalOpen
     },
     reducers: {
         getKey(state, { payload }) {
@@ -21,12 +23,16 @@ const keySlice = createSlice({
         },
         loaderToogle(state, { payload }) {
             state.isLoading = payload
+        },
+        modalWindowToogle(state, { payload }) {
+            state.isModalOpen = payload
         }
     }
 })
 
-export const { getKey, removeKey, loaderToogle } = keySlice.actions
-export const { selectKey, selectIsLoading } = keySlice.selectors
+export const { getKey, removeKey, loaderToogle, modalWindowToogle } = keySlice.actions
+
+export const { selectAddress, selectIsLoading, selectIsModalOpen } = keySlice.selectors
 
 export default keySlice.reducer
 

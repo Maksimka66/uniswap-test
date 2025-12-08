@@ -1,28 +1,58 @@
-import { useState } from 'react'
+import { useEffect, useState, type ChangeEvent } from 'react'
 import { useSelector } from 'react-redux'
+import { useDebounce } from 'use-debounce'
+import numeral from 'numeral'
 import clsx from 'clsx'
 import ArrowDownIcon from '../../icons/ArrowDownIcon'
 import SettingsIcon from '../../icons/SettingsIcon'
 import InputWrapper from '../../shared/InputWrapper'
 import Layout from '../../shared/Layout'
-import DropDownIcon from '../../icons/DropDownIcon'
 import ConnectButton from '../../shared/ConnectButton'
-import { selectKey } from '../../store/slice'
+import { selectAddress } from '../../store/slice'
+import { getAllCoinsService, getCurrentCoinService } from '../../api/coinGeckoApi'
+import type { ICoinInfo } from '../../interfaces/ICoinInfo/ICoinInfo'
 
 export default function Exchanger() {
     const [direction, setDirection] = useState('')
-    const [fieldFrom, setFieldFrom] = useState('0.0')
-    const [fieldTo, setFieldTo] = useState('0.0')
+    const [fieldFrom, setFieldFrom] = useState('')
+    const [fieldTo, setFieldTo] = useState('')
+    const [usd, setUsd] = useState(0)
 
-    const key = useSelector(selectKey)
+    const [fieldFromValue] = useDebounce(fieldFrom, 1000)
+    const [fieldToValue] = useDebounce(fieldTo, 1000)
 
-    const handleClick = () => {
+    const address = useSelector(selectAddress)
+
+    useEffect(() => {
+        async function getCoins() {
+            try {
+                const res = await getAllCoinsService()
+
+                const { id } = res.find((item: ICoinInfo) => item.id === 'bitcoin')
+
+                const { market_data } = await getCurrentCoinService(id)
+
+                setUsd(market_data.current_price.usd)
+            } catch (e) {
+                console.error(e)
+            }
+        }
+
+        getCoins()
+    }, [fieldFromValue, fieldToValue])
+
+    const toggleDirection = () => {
         if (!direction) {
             setDirection('flex-col-reverse')
         } else {
             setDirection('')
         }
     }
+
+    const calculatePrice = (value: string) =>
+        numeral(+value * usd)
+            .format('($0.00a)')
+            .toUpperCase()
 
     return (
         <Layout>
@@ -40,31 +70,29 @@ export default function Exchanger() {
             <div className={clsx('flex flex-col items-center mb-6', direction)}>
                 <InputWrapper
                     label='From'
+                    value={fieldFrom}
+                    debouncedValue={calculatePrice(fieldFromValue)}
                     inputClassName='placeholder:text-[18px] leading-[24px]'
-                    placeholder={fieldFrom}
-                    buttonClassname=''
-                    buttonContent={<></>}
+                    placeholder='0.0'
+                    handleChange={(e: ChangeEvent) =>
+                        setFieldFrom((e.target as HTMLInputElement).value)
+                    }
                 />
-                <button className='my-4' onClick={handleClick}>
+                <button className='my-4' onClick={toggleDirection}>
                     <ArrowDownIcon />
                 </button>
                 <InputWrapper
                     label='To'
+                    value={fieldTo}
+                    debouncedValue={calculatePrice(fieldToValue)}
+                    placeholder='0.0'
                     inputClassName='placeholder:text-[18px] leading-[24px]'
-                    placeholder={fieldTo}
-                    layoutClassName='items-end justify-between'
-                    buttonClassname='flex justify-between rounded-[10px] items-center px-3 py-1.5 bg-linear-to-t from-[#F43F5E] to-[#FDA4AF]'
-                    buttonContent={
-                        <>
-                            <span className='mr-[8px] text-[14px] text-white leading-[18px] font-medium font-dm'>
-                                Select a token
-                            </span>
-                            <DropDownIcon />
-                        </>
+                    handleChange={(e: ChangeEvent) =>
+                        setFieldTo((e.target as HTMLInputElement).value)
                     }
                 />
             </div>
-            {key ? (
+            {address ? (
                 <button className='rounded-[10px] font-medium font-dm w-full py-[16px] bg-[#FFF1F2] text-[#F43F5E] text-[18px] leading-[24px]'>
                     Add funds to swap
                 </button>
