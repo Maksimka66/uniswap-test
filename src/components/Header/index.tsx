@@ -4,11 +4,11 @@ import MoreMenuIcon from '../../icons/MoreMenuIcon'
 import { navRoutes } from '../../routes/routes'
 import ConnectButton from '../../shared/ConnectButton'
 import Navigation from '../Navigation'
-import { removeKey, selectKey } from '../../store/slice'
+import { removeKey, selectAddress } from '../../store/slice'
 
 export default function Header() {
     const dispatch = useDispatch()
-    const key = useSelector(selectKey)
+    const address = useSelector(selectAddress)
 
     const handleClick = () => {
         dispatch(removeKey())
@@ -24,13 +24,16 @@ export default function Header() {
             </div>
             <Navigation links={navRoutes} />
             <div className='flex items-center gap-2'>
-                {key ? (
-                    <button
-                        className='py-[8px] px-[20px] bg-linear-to-t from-[#F43F5E] to-[#FDA4AF] text-[16px] text-white leading-[20px] rounded-[10px] font-medium font-dm'
-                        onClick={handleClick}
-                    >
-                        Disconnect
-                    </button>
+                {address ? (
+                    <>
+                        <span>{address}</span>
+                        <button
+                            className='py-[8px] px-[20px] bg-linear-to-t from-[#F43F5E] to-[#FDA4AF] text-[16px] text-white leading-[20px] rounded-[10px] font-medium font-dm'
+                            onClick={handleClick}
+                        >
+                            Disconnect
+                        </button>
+                    </>
                 ) : (
                     <ConnectButton className='py-[8px] px-[20px] bg-linear-to-t from-[#F43F5E] to-[#FDA4AF] text-[16px] text-white leading-[20px]'>
                         Connect
