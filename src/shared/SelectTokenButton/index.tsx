@@ -1,11 +1,14 @@
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import DropDownIcon from '../../icons/DropDownIcon'
-import { modalWindowToogle } from '../../store/slice'
+import { modalWindowToogle, selectCurrentCoin } from '../../store/slice'
 
 export default function SelectTokenButton() {
     const dispatch = useDispatch()
 
-    const fetchCoinsOpen = async () => {
+    const currentCoin = useSelector(selectCurrentCoin)
+console.log(currentCoin);
+
+    const fetchCoinsOpen = () => {
         dispatch(modalWindowToogle(true))
     }
 

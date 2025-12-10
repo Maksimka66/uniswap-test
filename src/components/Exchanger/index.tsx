@@ -9,10 +9,14 @@ import InputWrapper from '../../shared/InputWrapper'
 import Layout from '../../shared/Layout'
 import ConnectButton from '../../shared/ConnectButton'
 import { selectAddress } from '../../store/slice'
-import { getAllCoinsService, getCurrentCoinService } from '../../api/coinGeckoApi'
 import type { ICoinInfo } from '../../interfaces/ICoinInfo/ICoinInfo'
+import { useLazyGetAllCoinsQuery, useLazyGetCurrentCoinQuery } from '../../api/coinGeckoApi'
+import Loader from '../../shared/Loader'
 
 export default function Exchanger() {
+    const [fetchCoins, { isLoading: loadAllCoins }] = useLazyGetAllCoinsQuery()
+    const [fetchCurrentCoin, { isLoading: loadCurrentCoin }] = useLazyGetCurrentCoinQuery()
+
     const [direction, setDirection] = useState('')
     const [fieldFrom, setFieldFrom] = useState('')
     const [fieldTo, setFieldTo] = useState('')
@@ -26,20 +30,24 @@ export default function Exchanger() {
     useEffect(() => {
         async function getCoins() {
             try {
-                const res = await getAllCoinsService()
+                const { data } = await fetchCoins({})
 
-                const { id } = res.find((item: ICoinInfo) => item.id === 'bitcoin')
+                if (data) {
+                    const { id } = data.find((item: ICoinInfo) => item.id === 'bitcoin')
 
-                const { market_data } = await getCurrentCoinService(id)
+                    const res = await fetchCurrentCoin(id)
 
-                setUsd(market_data.current_price.usd)
+                    if (res) {
+                        setUsd(res.data.market_data.current_price.usd)
+                    }
+                }
             } catch (e) {
                 console.error(e)
             }
         }
 
         getCoins()
-    }, [fieldFromValue, fieldToValue])
+    }, [fetchCoins, fetchCurrentCoin, fieldFromValue, fieldToValue])
 
     const toggleDirection = () => {
         if (!direction) {
@@ -53,6 +61,10 @@ export default function Exchanger() {
         numeral(+value * usd)
             .format('($0.00a)')
             .toUpperCase()
+
+    if (loadAllCoins || loadCurrentCoin) {
+        return <Loader />
+    }
 
     return (
         <Layout>

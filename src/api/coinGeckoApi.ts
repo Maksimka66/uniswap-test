@@ -1,30 +1,19 @@
-import axios from 'axios'
+import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 
-axios.defaults.baseURL = 'https://api.coingecko.com/api/v3'
-
-axios.defaults.headers.common['x-cg-demo-api-key'] = import.meta.env.VITE_COINGECKO_API_KEY
-
-export async function getAllCoinsService() {
-    try {
-        const res = await axios.get('/coins/markets', {
-            params: {
-                vs_currency: 'usd'
-            }
+export const coinGeckoApi = createApi({
+    reducerPath: 'coinGeckoApi',
+    baseQuery: fetchBaseQuery({
+        baseUrl: 'https://api.coingecko.com/api/v3'
+    }),
+    endpoints: (build) => ({
+        getAllCoins: build.query({
+            query: () => '/coins/markets?vs_currency=usd'
+        }),
+        getCurrentCoin: build.query({
+            query: (id) => `/coins/${id}`
         })
+    })
+})
 
-        return res.data
-    } catch (e) {
-        console.error(e)
-    }
-}
-
-export async function getCurrentCoinService(id: string) {
-    try {
-        const res = await axios.get(`/coins/${id}`)
-
-        return res.data
-    } catch (e) {
-        console.error(e)
-    }
-}
+export const { useLazyGetAllCoinsQuery, useLazyGetCurrentCoinQuery } = coinGeckoApi
 
