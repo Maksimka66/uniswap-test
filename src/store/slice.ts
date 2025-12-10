@@ -2,7 +2,8 @@ import { createSlice } from '@reduxjs/toolkit'
 
 const initialState = {
     key: '',
-    isLoading: false,
+    allCoins: [],
+    currentCoin: null,
     isModalOpen: false
 }
 
@@ -11,7 +12,8 @@ const keySlice = createSlice({
     initialState,
     selectors: {
         selectAddress: (state) => state.key,
-        selectIsLoading: (state) => state.isLoading,
+        selectAllCoins: (state) => state.allCoins,
+        selectCurrentCoin: (state) => state.currentCoin,
         selectIsModalOpen: (state) => state.isModalOpen
     },
     reducers: {
@@ -21,8 +23,11 @@ const keySlice = createSlice({
         removeKey(state) {
             state.key = ''
         },
-        loaderToogle(state, { payload }) {
-            state.isLoading = payload
+        setAllCoins(state, { payload }) {
+            state.allCoins = payload
+        },
+        setCurrentCoin(state, { payload }) {
+            state.currentCoin = payload
         },
         modalWindowToogle(state, { payload }) {
             state.isModalOpen = payload
@@ -30,9 +35,11 @@ const keySlice = createSlice({
     }
 })
 
-export const { getKey, removeKey, loaderToogle, modalWindowToogle } = keySlice.actions
+export const { getKey, removeKey, setAllCoins, setCurrentCoin, modalWindowToogle } =
+    keySlice.actions
 
-export const { selectAddress, selectIsLoading, selectIsModalOpen } = keySlice.selectors
+export const { selectAddress, selectAllCoins, selectCurrentCoin, selectIsModalOpen } =
+    keySlice.selectors
 
 export default keySlice.reducer
 
