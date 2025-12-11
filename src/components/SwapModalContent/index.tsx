@@ -1,39 +1,20 @@
-import { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import type { ICoinInfo } from '../../interfaces/ICoinInfo/ICoinInfo'
+import { selectAllCoins, modalWindowToogle } from '../../store/slice'
+import { useLazyGetCurrentCoinQuery } from '../../api/coinGeckoApi'
 import Loader from '../../shared/Loader'
-import { useLazyGetAllCoinsQuery } from '../../api/coinGeckoApi'
-import { setAllCoins, selectAllCoins, setCurrentCoin, modalWindowToogle } from '../../store/slice'
 
 export default function SwapModalContent() {
-    const [getCoins, { isFetching }] = useLazyGetAllCoinsQuery()
+    const [fetchCurrentCoin, { isFetching }] = useLazyGetCurrentCoinQuery()
 
     const dispatch = useDispatch()
 
     const coins = useSelector(selectAllCoins)
 
-    useEffect(() => {
-        async function fetchCoins() {
-            try {
-                const { data } = await getCoins({})
+    const applyCoin = async (id) => {
+        const { data } = await fetchCurrentCoin(id)
 
-                if (data) {
-                    dispatch(setAllCoins(data))
-                }
-            } catch (e) {
-                console.error(e)
-            }
-        }
-
-        fetchCoins()
-    }, [dispatch, getCoins])
-
-    const applyCoin = (id) => {
-        const currentCoin = coins.find((coin) => coin.id === id)
-        console.log(currentCoin)
-
-        if (currentCoin) {
-            dispatch(setCurrentCoin(currentCoin))
+        if (data) {
             dispatch(modalWindowToogle(false))
         }
     }
@@ -60,7 +41,7 @@ export default function SwapModalContent() {
                                 className='w-[44px] h-[44px]'
                             />
                             <div>
-                                <p className='font-dm font-medium text-[#131313] text-[18px]'>
+                                <p className='font-dm font-medium text-[#131313] text-[18px] text-left'>
                                     {coin.name}
                                 </p>
                                 <p className='font-dm font-medium text-[#131313A1] text-[14px] text-left'>

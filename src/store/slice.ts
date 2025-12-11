@@ -1,9 +1,12 @@
 import { createSlice } from '@reduxjs/toolkit'
+import { coinGeckoApi } from '../api/coinGeckoApi'
 
 const initialState = {
     key: '',
     allCoins: [],
-    currentCoin: null,
+    tokenButtonId: 0,
+    firstCoin: null,
+    secondCoin: null,
     isModalOpen: false
 }
 
@@ -13,7 +16,8 @@ const keySlice = createSlice({
     selectors: {
         selectAddress: (state) => state.key,
         selectAllCoins: (state) => state.allCoins,
-        selectCurrentCoin: (state) => state.currentCoin,
+        selectFirstCoin: (state) => state.firstCoin,
+        selectSecondCoin: (state) => state.secondCoin,
         selectIsModalOpen: (state) => state.isModalOpen
     },
     reducers: {
@@ -23,23 +27,50 @@ const keySlice = createSlice({
         removeKey(state) {
             state.key = ''
         },
-        setAllCoins(state, { payload }) {
-            state.allCoins = payload
-        },
-        setCurrentCoin(state, { payload }) {
-            state.currentCoin = payload
+        setTokenButtonId(state, { payload }) {
+            state.tokenButtonId = payload
         },
         modalWindowToogle(state, { payload }) {
             state.isModalOpen = payload
         }
+    },
+    extraReducers: (builder) => {
+        builder.addMatcher(
+            coinGeckoApi.endpoints.getAllCoins.matchFulfilled,
+            (state, { payload }) => {
+                state.allCoins = payload
+            }
+        )
+
+        builder.addMatcher(
+            coinGeckoApi.endpoints.getCurrentCoin.matchFulfilled,
+            (state, { payload }) => {
+                if (!state.firstCoin || state.tokenButtonId === 1) {
+                    state.firstCoin = payload
+                }
+
+                if (state.tokenButtonId === 2) {
+                    state.secondCoin = payload
+                }
+
+                // if (state.firstCoin && state.firstCoin.id === state.secondCoin.id) {
+                //     console.log(state.firstCoin.id)
+                //     console.log(payload.id)
+                // }
+            }
+        )
     }
 })
 
-export const { getKey, removeKey, setAllCoins, setCurrentCoin, modalWindowToogle } =
-    keySlice.actions
+export const { getKey, removeKey, setTokenButtonId, modalWindowToogle } = keySlice.actions
 
-export const { selectAddress, selectAllCoins, selectCurrentCoin, selectIsModalOpen } =
-    keySlice.selectors
+export const {
+    selectAddress,
+    selectAllCoins,
+    selectFirstCoin,
+    selectSecondCoin,
+    selectIsModalOpen
+} = keySlice.selectors
 
 export default keySlice.reducer
 

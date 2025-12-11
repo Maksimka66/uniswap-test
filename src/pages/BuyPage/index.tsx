@@ -4,7 +4,11 @@ export default function BuyPage() {
     return (
         <>
             <Header />
-            <div>Buy</div>
+            <main className='flex items-center bg-main h-screen'>{/* <Exchanger /> */}</main>
+
+            {/* <ModalWindow>
+                <SwapModalContent />
+            </ModalWindow> */}
         </>
     )
 }
