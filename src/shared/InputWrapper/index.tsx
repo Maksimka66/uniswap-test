@@ -1,16 +1,16 @@
 import { useId } from 'react'
 import clsx from 'clsx'
 import type { IInputWrapperProps } from '../../interfaces/IInputWrapper/IInputWrapper'
-import SelectTokenButton from '../SelectTokenButton'
 
 export default function InputWrapper({
+    handleChange,
+    children,
     label,
     placeholder,
     layoutClassName,
     inputClassName,
     value,
-    debouncedValue,
-    handleChange
+    debouncedValue
 }: IInputWrapperProps) {
     const id = useId()
 
@@ -33,8 +33,9 @@ export default function InputWrapper({
                         'mb-[4px] py-[8px] focus:outline-none placeholder:font-bold placeholder:font-dm placeholder:text-placeholder',
                         inputClassName
                     )}
-                    id={id}
                     type='text'
+                    inputMode='numeric'
+                    id={id}
                     placeholder={placeholder}
                     value={value}
                     onChange={handleChange}
@@ -43,7 +44,7 @@ export default function InputWrapper({
                     {debouncedValue}
                 </span>
             </div>
-            <SelectTokenButton />
+            {children}
         </div>
     )
 }

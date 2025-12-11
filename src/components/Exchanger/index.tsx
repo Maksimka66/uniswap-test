@@ -8,46 +8,46 @@ import SettingsIcon from '../../icons/SettingsIcon'
 import InputWrapper from '../../shared/InputWrapper'
 import Layout from '../../shared/Layout'
 import ConnectButton from '../../shared/ConnectButton'
-import { selectAddress } from '../../store/slice'
-import type { ICoinInfo } from '../../interfaces/ICoinInfo/ICoinInfo'
-import { useLazyGetAllCoinsQuery, useLazyGetCurrentCoinQuery } from '../../api/coinGeckoApi'
+import { selectAddress, selectFirstCoin, selectSecondCoin } from '../../store/slice'
+import { useLazyGetAllCoinsQuery } from '../../api/coinGeckoApi'
+import SelectTokenButton from '../../shared/SelectTokenButton'
 import Loader from '../../shared/Loader'
 
 export default function Exchanger() {
-    const [fetchCoins, { isLoading: loadAllCoins }] = useLazyGetAllCoinsQuery()
-    const [fetchCurrentCoin, { isLoading: loadCurrentCoin }] = useLazyGetCurrentCoinQuery()
+    const [fetchCoins, { isLoading }] = useLazyGetAllCoinsQuery()
 
     const [direction, setDirection] = useState('')
     const [fieldFrom, setFieldFrom] = useState('')
     const [fieldTo, setFieldTo] = useState('')
-    const [usd, setUsd] = useState(0)
 
     const [fieldFromValue] = useDebounce(fieldFrom, 1000)
     const [fieldToValue] = useDebounce(fieldTo, 1000)
 
     const address = useSelector(selectAddress)
+    const firstCoin = useSelector(selectFirstCoin)
+    const secondCoin = useSelector(selectSecondCoin)
 
     useEffect(() => {
         async function getCoins() {
             try {
-                const { data } = await fetchCoins({})
-
-                if (data) {
-                    const { id } = data.find((item: ICoinInfo) => item.id === 'bitcoin')
-
-                    const res = await fetchCurrentCoin(id)
-
-                    if (res) {
-                        setUsd(res.data.market_data.current_price.usd)
-                    }
-                }
+                await fetchCoins({})
             } catch (e) {
                 console.error(e)
             }
         }
 
         getCoins()
-    }, [fetchCoins, fetchCurrentCoin, fieldFromValue, fieldToValue])
+    }, [fetchCoins])
+
+    const calculatePrice = (value, coin) => {
+        if (coin) {
+            return numeral(+value * coin.market_data.current_price.usd)
+                .format('($0.00a)')
+                .toUpperCase()
+        } else {
+            return numeral(0).format('($0.00a)')
+        }
+    }
 
     const toggleDirection = () => {
         if (!direction) {
@@ -57,12 +57,7 @@ export default function Exchanger() {
         }
     }
 
-    const calculatePrice = (value: string) =>
-        numeral(+value * usd)
-            .format('($0.00a)')
-            .toUpperCase()
-
-    if (loadAllCoins || loadCurrentCoin) {
+    if (isLoading) {
         return <Loader />
     }
 
@@ -83,26 +78,31 @@ export default function Exchanger() {
                 <InputWrapper
                     label='From'
                     value={fieldFrom}
-                    debouncedValue={calculatePrice(fieldFromValue)}
+                    debouncedValue={calculatePrice(fieldFromValue, firstCoin)}
                     inputClassName='placeholder:text-[18px] leading-[24px]'
                     placeholder='0.0'
                     handleChange={(e: ChangeEvent) =>
-                        setFieldFrom((e.target as HTMLInputElement).value)
+                        setFieldFrom((e.target as HTMLInputElement).value.replace(/[^0-9]/g, ''))
                     }
-                />
+                >
+                    <SelectTokenButton currentCoin={firstCoin} buttonId={1} />
+                </InputWrapper>
+
                 <button className='my-4' onClick={toggleDirection}>
                     <ArrowDownIcon />
                 </button>
                 <InputWrapper
                     label='To'
                     value={fieldTo}
-                    debouncedValue={calculatePrice(fieldToValue)}
+                    debouncedValue={calculatePrice(fieldToValue, secondCoin)}
                     placeholder='0.0'
                     inputClassName='placeholder:text-[18px] leading-[24px]'
                     handleChange={(e: ChangeEvent) =>
-                        setFieldTo((e.target as HTMLInputElement).value)
+                        setFieldTo((e.target as HTMLInputElement).value.replace(/[^0-9]/g, ''))
                     }
-                />
+                >
+                    <SelectTokenButton currentCoin={secondCoin} buttonId={2} />
+                </InputWrapper>
             </div>
             {address ? (
                 <button className='rounded-[10px] font-medium font-dm w-full py-[16px] bg-[#FFF1F2] text-[#F43F5E] text-[18px] leading-[24px]'>
