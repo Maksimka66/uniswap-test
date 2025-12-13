@@ -9,16 +9,14 @@ import InputWrapper from '../../shared/InputWrapper'
 import Layout from '../../shared/Layout'
 import ConnectButton from '../../shared/ConnectButton'
 import { selectAddress, selectFirstCoin, selectSecondCoin } from '../../store/slice'
-import { useLazyGetAllCoinsQuery } from '../../api/coinGeckoApi'
 import SelectTokenButton from '../../shared/SelectTokenButton'
-import Loader from '../../shared/Loader'
 
 export default function Exchanger() {
-    const [fetchCoins, { isLoading }] = useLazyGetAllCoinsQuery()
-
     const [direction, setDirection] = useState('')
     const [fieldFrom, setFieldFrom] = useState('')
     const [fieldTo, setFieldTo] = useState('')
+    const [firstPrice, setFirstPrice] = useState(0)
+    const [secondPrice, setSecondPrice] = useState(0)
 
     const [fieldFromValue] = useDebounce(fieldFrom, 1000)
     const [fieldToValue] = useDebounce(fieldTo, 1000)
@@ -28,20 +26,30 @@ export default function Exchanger() {
     const secondCoin = useSelector(selectSecondCoin)
 
     useEffect(() => {
-        async function getCoins() {
-            try {
-                await fetchCoins({})
-            } catch (e) {
-                console.error(e)
-            }
+        if (firstCoin) {
+            const {
+                market_data: {
+                    current_price: { usd }
+                }
+            } = firstCoin
+
+            setFirstPrice(usd)
         }
 
-        getCoins()
-    }, [fetchCoins])
+        if (secondCoin) {
+            const {
+                market_data: {
+                    current_price: { usd }
+                }
+            } = secondCoin
 
-    const calculatePrice = (value, coin) => {
+            setSecondPrice(usd)
+        }
+    }, [firstCoin, secondCoin])
+
+    const calculatePrice = (value: string, coin: number) => {
         if (coin) {
-            return numeral(+value * coin.market_data.current_price.usd)
+            return numeral(+value * coin)
                 .format('($0.00a)')
                 .toUpperCase()
         } else {
@@ -55,10 +63,6 @@ export default function Exchanger() {
         } else {
             setDirection('')
         }
-    }
-
-    if (isLoading) {
-        return <Loader />
     }
 
     return (
@@ -78,14 +82,18 @@ export default function Exchanger() {
                 <InputWrapper
                     label='From'
                     value={fieldFrom}
-                    debouncedValue={calculatePrice(fieldFromValue, firstCoin)}
+                    debouncedValue={calculatePrice(fieldFromValue, firstPrice)}
                     inputClassName='placeholder:text-[18px] leading-[24px]'
                     placeholder='0.0'
                     handleChange={(e: ChangeEvent) =>
                         setFieldFrom((e.target as HTMLInputElement).value.replace(/[^0-9]/g, ''))
                     }
                 >
-                    <SelectTokenButton currentCoin={firstCoin} buttonId={1} />
+                    <SelectTokenButton
+                        currentCoin={firstCoin}
+                        buttonId={1}
+                        className='px-3 py-1.5 rounded-[98px]'
+                    />
                 </InputWrapper>
 
                 <button className='my-4' onClick={toggleDirection}>
@@ -94,14 +102,18 @@ export default function Exchanger() {
                 <InputWrapper
                     label='To'
                     value={fieldTo}
-                    debouncedValue={calculatePrice(fieldToValue, secondCoin)}
+                    debouncedValue={calculatePrice(fieldToValue, secondPrice)}
                     placeholder='0.0'
                     inputClassName='placeholder:text-[18px] leading-[24px]'
                     handleChange={(e: ChangeEvent) =>
                         setFieldTo((e.target as HTMLInputElement).value.replace(/[^0-9]/g, ''))
                     }
                 >
-                    <SelectTokenButton currentCoin={secondCoin} buttonId={2} />
+                    <SelectTokenButton
+                        currentCoin={secondCoin}
+                        buttonId={2}
+                        className='px-3 py-1.5 rounded-[98px]'
+                    />
                 </InputWrapper>
             </div>
             {address ? (

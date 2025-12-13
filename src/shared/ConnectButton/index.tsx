@@ -3,7 +3,7 @@ import { connectWallet } from '../../api/connectWalletApi'
 import { getKey } from '../../store/slice'
 import type { IConnectButton } from '../../interfaces/IConnectButton/IConnectButton'
 
-export default function ConnectButton({ children, className }: IConnectButton) {
+export default function ConnectButton({ children, className, disabled }: IConnectButton) {
     const dispatch = useDispatch()
 
     const connect = async () => {
@@ -17,7 +17,11 @@ export default function ConnectButton({ children, className }: IConnectButton) {
     }
 
     return (
-        <button className={`rounded-[10px] font-medium font-dm ${className}`} onClick={connect}>
+        <button
+            disabled={disabled}
+            className={`rounded-[10px] font-medium font-dm disabled:bg-[#1313131a] disabled:text-[#131313] ${className}`}
+            onClick={connect}
+        >
             {children}
         </button>
     )

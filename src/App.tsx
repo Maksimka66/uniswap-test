@@ -1,5 +1,4 @@
-import { Route, Routes } from 'react-router-dom'
-import MainPage from './pages/MainPage'
+import { Navigate, Route, Routes } from 'react-router-dom'
 import BuyPage from './pages/BuyPage'
 import LimitPage from './pages/LimitPage'
 import SwapPage from './pages/SwapPage'
@@ -11,7 +10,7 @@ function App() {
     return (
         <>
             <Routes>
-                <Route path='/' element={<MainPage />} />
+                <Route path='/' element={<Navigate to='/swap' replace />} />
                 <Route path='/swap' element={<SwapPage />} />
                 <Route path='/limit' element={<LimitPage />} />
                 <Route path='/buy' element={<BuyPage />} />
