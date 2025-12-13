@@ -11,7 +11,7 @@ export default function SwapModalContent() {
 
     const coins = useSelector(selectAllCoins)
 
-    const applyCoin = async (id) => {
+    const applyCoin = async (id: string) => {
         const { data } = await fetchCurrentCoin(id)
 
         if (data) {

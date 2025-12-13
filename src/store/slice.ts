@@ -52,11 +52,6 @@ const keySlice = createSlice({
                 if (state.tokenButtonId === 2) {
                     state.secondCoin = payload
                 }
-
-                // if (state.firstCoin && state.firstCoin.id === state.secondCoin.id) {
-                //     console.log(state.firstCoin.id)
-                //     console.log(payload.id)
-                // }
             }
         )
     }

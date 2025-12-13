@@ -15,7 +15,7 @@ export default function Header() {
     }
 
     return (
-        <header className='py-[22px] px-[44px] flex justify-between items-center border-b border-[#F3F4F6]'>
+        <header className='py-[22px] px-[44px] flex justify-between items-center border-b border-[#F3F4F6] relative'>
             <div className='flex items-center gap-2'>
                 <CherryIcon />
                 <h1 className='text-[16px] leading-[18px] text-transparent bg-clip-text bg-gradient-to-l from-[#F43F5E] to-[#FDA4AF] font-main font-normal'>

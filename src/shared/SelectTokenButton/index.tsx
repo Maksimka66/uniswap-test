@@ -4,8 +4,9 @@ import DropDownIcon from '../../icons/DropDownIcon'
 import { modalWindowToogle, setTokenButtonId } from '../../store/slice'
 import { useLazyGetCurrentCoinQuery } from '../../api/coinGeckoApi'
 import Loader from '../Loader'
+import clsx from 'clsx'
 
-export default function SelectTokenButton({ currentCoin, buttonId }) {
+export default function SelectTokenButton({ currentCoin, buttonId, className }) {
     const [fetchCurrentCoin, { isFetching }] = useLazyGetCurrentCoinQuery()
 
     const dispatch = useDispatch()
@@ -31,10 +32,13 @@ export default function SelectTokenButton({ currentCoin, buttonId }) {
 
     return (
         <button
-            className={`text-[14px] leading-[18px] font-medium font-dm flex items-center gap-[8px] rounded-[98px] px-3 py-1.5 ${
+            className={`text-[14px] leading-[18px] font-medium font-dm flex items-center gap-[8px] ${
                 currentCoin
-                    ? 'bg-white border border-[#f2f2f2] shadow-[0_0_10px_#1313130a]'
-                    : 'text-white bg-linear-to-t from-[#F43F5E] to-[#FDA4AF]'
+                    ? clsx(
+                          'bg-white border border-[#f2f2f2] shadow-[0_0_10px_#1313130a]',
+                          className
+                      )
+                    : clsx('text-white bg-linear-to-t from-[#F43F5E] to-[#FDA4AF]', className)
             }`}
             id={buttonId}
             onClick={fetchCoinsOpen}
@@ -45,6 +49,7 @@ export default function SelectTokenButton({ currentCoin, buttonId }) {
                     <span className='font-dm font-medium text-[#131313] text-[16px] text-left'>
                         {currentCoin.symbol.toUpperCase()}
                     </span>
+
                     <DropDownIcon width={24} height={24} color={'#131313A1'} />
                 </>
             ) : (
