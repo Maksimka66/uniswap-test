@@ -11,7 +11,6 @@ import {
 } from 'redux-persist'
 import storage from 'redux-persist/lib/storage'
 import keyReducer from './slice'
-import { coinGeckoApi } from '../api/coinGeckoApi'
 
 const persistConfig = {
     key: 'userKey',
@@ -23,15 +22,14 @@ const keyPersistedReduser = persistReducer(persistConfig, keyReducer)
 
 export const store = configureStore({
     reducer: {
-        key: keyPersistedReduser,
-        [coinGeckoApi.reducerPath]: coinGeckoApi.reducer
+        key: keyPersistedReduser
     },
     middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware({
             serializableCheck: {
                 ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER]
             }
-        }).concat(coinGeckoApi.middleware)
+        })
 })
 
 export const persistor = persistStore(store)

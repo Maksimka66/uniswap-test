@@ -31,7 +31,7 @@
     overflow-y: auto;
     border-radius: 20px;
     background-color: #ffffff;
-    padding: 24px 16px;
+    padding: 0 16px;
     transition: transform 0.3s;
     transform: translateY(50px);
 }

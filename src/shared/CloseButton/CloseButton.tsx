@@ -7,7 +7,7 @@ export default function CloseButton() {
 
     return (
         <button
-            className={'absolute top-[24px] right-[24px] bg-transparent w-[24px] h-[24px]'}
+            className={'sticky top-0 right-0 bg-transparent w-[24px] h-[24px]'}
             onClick={() => dispatch(modalWindowToogle(false))}
         >
             <CloseIcon />

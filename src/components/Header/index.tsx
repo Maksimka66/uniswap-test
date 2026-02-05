@@ -8,6 +8,7 @@ import { removeKey, selectAddress } from '../../store/slice'
 
 export default function Header() {
     const dispatch = useDispatch()
+
     const address = useSelector(selectAddress)
 
     const handleClick = () => {

@@ -1,12 +1,12 @@
 import { createSlice } from '@reduxjs/toolkit'
-import { coinGeckoApi } from '../api/coinGeckoApi'
 
 const initialState = {
-    key: '',
+    address: '',
     allCoins: [],
-    tokenButtonId: 0,
-    firstCoin: null,
-    secondCoin: null,
+    filteredCoins: [],
+    buttonId: '',
+    sellCoin: null,
+    buyCoin: null,
     isModalOpen: false
 }
 
@@ -14,56 +14,72 @@ const keySlice = createSlice({
     name: 'key',
     initialState,
     selectors: {
-        selectAddress: (state) => state.key,
+        selectAddress: (state) => state.address,
         selectAllCoins: (state) => state.allCoins,
-        selectFirstCoin: (state) => state.firstCoin,
-        selectSecondCoin: (state) => state.secondCoin,
+        selectFilteredCoins: (state) => state.filteredCoins,
+        selectButtonId: (state) => state.buttonId,
+        selectSellCoin: (state) => state.sellCoin,
+        selectBuyCoin: (state) => state.buyCoin,
         selectIsModalOpen: (state) => state.isModalOpen
     },
     reducers: {
         getKey(state, { payload }) {
-            state.key = payload
+            state.address = payload
         },
         removeKey(state) {
-            state.key = ''
-        },
-        setTokenButtonId(state, { payload }) {
-            state.tokenButtonId = payload
+            state.address = ''
         },
         modalWindowToogle(state, { payload }) {
             state.isModalOpen = payload
+        },
+        setCoins(state, { payload }) {
+            state.allCoins = payload
+        },
+        setFilteredCoins(state, { payload }) {
+            state.filteredCoins = payload
+        },
+        setCurrentCoin(state, { payload }) {
+            if (state.buttonId === 'sell') {
+                if (state.buyCoin?.address === payload.address) {
+                    state.sellCoin = payload
+                    state.buyCoin = null
+                } else {
+                    state.sellCoin = payload
+                }
+            }
+
+            if (state.buttonId === 'buy') {
+                if (state.sellCoin?.address === payload.address) {
+                    state.buyCoin = payload
+                    state.sellCoin = null
+                } else {
+                    state.buyCoin = payload
+                }
+            }
+        },
+        setButtonId(state, { payload }) {
+            state.buttonId = payload
         }
-    },
-    extraReducers: (builder) => {
-        builder.addMatcher(
-            coinGeckoApi.endpoints.getAllCoins.matchFulfilled,
-            (state, { payload }) => {
-                state.allCoins = payload
-            }
-        )
-
-        builder.addMatcher(
-            coinGeckoApi.endpoints.getCurrentCoin.matchFulfilled,
-            (state, { payload }) => {
-                if (!state.firstCoin || state.tokenButtonId === 1) {
-                    state.firstCoin = payload
-                }
-
-                if (state.tokenButtonId === 2) {
-                    state.secondCoin = payload
-                }
-            }
-        )
     }
 })
 
-export const { getKey, removeKey, setTokenButtonId, modalWindowToogle } = keySlice.actions
+export const {
+    getKey,
+    removeKey,
+    modalWindowToogle,
+    setCoins,
+    setFilteredCoins,
+    setButtonId,
+    setCurrentCoin
+} = keySlice.actions
 
 export const {
     selectAddress,
     selectAllCoins,
-    selectFirstCoin,
-    selectSecondCoin,
+    selectFilteredCoins,
+    selectButtonId,
+    selectSellCoin,
+    selectBuyCoin,
     selectIsModalOpen
 } = keySlice.selectors
 

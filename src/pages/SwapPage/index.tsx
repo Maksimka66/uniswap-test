@@ -3,31 +3,33 @@ import Header from '../../components/Header'
 import ModalWindow from '../../shared/ModalWindow'
 import SwapModalContent from '../../components/SwapModalContent'
 import { useEffect } from 'react'
-import { useLazyGetAllCoinsQuery } from '../../api/coinGeckoApi'
-import Loader from '../../shared/Loader'
+import { useDispatch, useSelector } from 'react-redux'
+import { getTokens } from '../../api/uniswapApi'
+import { selectAllCoins, setCoins, setFilteredCoins } from '../../store/slice'
 
 export default function SwapPage() {
-    const [fetchCoins, { isFetching }] = useLazyGetAllCoinsQuery()
+    const dispatch = useDispatch()
+
+    const coins = useSelector(selectAllCoins)
 
     useEffect(() => {
-        async function getCoins() {
-            try {
-                await fetchCoins({})
-            } catch (e) {
-                console.error(e)
+        if (!coins.length) {
+            async function fetchTokens() {
+                try {
+                    const res = await getTokens()
+
+                    const ethereumTokens = res.tokens.filter((token) => token.chainId === 1)
+
+                    dispatch(setCoins(ethereumTokens))
+                    dispatch(setFilteredCoins(ethereumTokens))
+                } catch (e) {
+                    console.log(e)
+                }
             }
+
+            fetchTokens()
         }
-
-        getCoins()
-    }, [fetchCoins])
-
-    if (isFetching) {
-        return (
-            <div className='flex items-center bg-main h-screen'>
-                <Loader />
-            </div>
-        )
-    }
+    }, [coins.length, dispatch])
 
     return (
         <>

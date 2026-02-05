@@ -1,23 +1,22 @@
-import { useId } from 'react'
 import clsx from 'clsx'
 import type { IInputWrapperProps } from '../../interfaces/IInputWrapper/IInputWrapper'
 
 export default function InputWrapper({
     handleChange,
     children,
+    id,
     label,
     placeholder,
     layoutClassName,
     inputClassName,
     value,
-    debouncedValue
+    debouncedValue,
+    disabled
 }: IInputWrapperProps) {
-    const id = useId()
-
     return (
         <div
             className={clsx(
-                'flex items-center justify-between p-4 bg-layout-bg rounded-[12px] w-full border border-frame-color',
+                'flex items-center justify-between p-4 bg-layout-bg rounded-xl w-full border border-frame-color',
                 layoutClassName
             )}
         >
@@ -30,7 +29,7 @@ export default function InputWrapper({
                 </label>
                 <input
                     className={clsx(
-                        'mb-[4px] py-[8px] focus:outline-none placeholder:font-bold placeholder:font-dm placeholder:text-placeholder',
+                        'mb-1 py-2 focus:outline-none placeholder:font-bold placeholder:font-dm placeholder:text-placeholder',
                         inputClassName
                     )}
                     type='text'
@@ -39,7 +38,9 @@ export default function InputWrapper({
                     placeholder={placeholder}
                     value={value}
                     onChange={handleChange}
+                    disabled={disabled ? true : false}
                 />
+
                 <span className='font-dm font-medium text-[14px] leading-[18px] text-main-text'>
                     {debouncedValue}
                 </span>
@@ -48,4 +49,3 @@ export default function InputWrapper({
         </div>
     )
 }
-

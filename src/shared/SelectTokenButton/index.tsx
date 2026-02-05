@@ -1,33 +1,22 @@
-import { useEffect } from 'react'
 import { useDispatch } from 'react-redux'
-import DropDownIcon from '../../icons/DropDownIcon'
-import { modalWindowToogle, setTokenButtonId } from '../../store/slice'
-import { useLazyGetCurrentCoinQuery } from '../../api/coinGeckoApi'
-import Loader from '../Loader'
 import clsx from 'clsx'
+import DropDownIcon from '../../icons/DropDownIcon'
+import { modalWindowToogle, setButtonId } from '../../store/slice'
+// import { useLazyGetCurrentCoinQuery } from '../../api/coinGeckoApi'
+// import Loader from '../Loader'
+import type { ISelectTokenButton } from '../../interfaces/ISelectTokenButton/ISelectTokenButton'
+import type { MouseEventHandler } from 'react'
 
-export default function SelectTokenButton({ currentCoin, buttonId, className }) {
-    const [fetchCurrentCoin, { isFetching }] = useLazyGetCurrentCoinQuery()
-
+export default function SelectTokenButton({
+    currentCoin,
+    className,
+    buttonId
+}: ISelectTokenButton) {
     const dispatch = useDispatch()
 
-    const fetchCoinsOpen = async () => {
-        dispatch(setTokenButtonId(buttonId))
+    const fetchCoinsOpen: MouseEventHandler<HTMLButtonElement> = (e) => {
+        dispatch(setButtonId(e.currentTarget.id))
         dispatch(modalWindowToogle(true))
-    }
-
-    useEffect(() => {
-        async function getBitcoin() {
-            if (buttonId === 1) {
-                await fetchCurrentCoin('bitcoin')
-            }
-        }
-
-        getBitcoin()
-    }, [buttonId, fetchCurrentCoin])
-
-    if (isFetching) {
-        return <Loader />
     }
 
     return (
@@ -45,7 +34,12 @@ export default function SelectTokenButton({ currentCoin, buttonId, className }) 
         >
             {currentCoin ? (
                 <>
-                    <img src={currentCoin.image.thumb} alt={`${currentCoin.name} image`} />
+                    <img
+                        width={24}
+                        height={24}
+                        src={currentCoin.logoURI}
+                        alt={`${currentCoin.name} image`}
+                    />
                     <span className='font-dm font-medium text-[#131313] text-[16px] text-left'>
                         {currentCoin.symbol.toUpperCase()}
                     </span>

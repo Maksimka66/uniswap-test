@@ -2,7 +2,6 @@ import type { PropsWithChildren } from 'react'
 import Modal from 'react-modal'
 import { useDispatch, useSelector } from 'react-redux'
 import { modalWindowToogle, selectIsModalOpen } from '../../store/slice'
-import CloseButton from '../CloseButton/CloseButton'
 
 import './styles.css'
 
@@ -24,7 +23,6 @@ export default function ModalWindow({ children }: PropsWithChildren) {
             ariaHideApp={false}
             onRequestClose={closeWindow}
         >
-            <CloseButton />
             {children}
         </Modal>
     )

@@ -1,22 +1,45 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
+import axios from 'axios'
 
-export const coinGeckoApi = createApi({
-    reducerPath: 'coinGeckoApi',
-    baseQuery: fetchBaseQuery({
-        baseUrl: 'https://api.coingecko.com/api/v3',
-        headers: {
-            'x-cg-demo-api-key': import.meta.env.VITE_COINGECKO_API_KEY
-        }
-    }),
-    endpoints: (build) => ({
-        getAllCoins: build.query({
-            query: () => '/coins/markets?vs_currency=usd'
-        }),
-        getCurrentCoin: build.query({
-            query: (id) => `/coins/${id}`
-        })
-    })
-})
+// axios.defaults.baseURL = 'https://api.coingecko.com/api/v3'
 
-export const { useLazyGetAllCoinsQuery, useLazyGetCurrentCoinQuery } = coinGeckoApi
+// axios.defaults.headers.common['x-cg-demo-api-key'] = import.meta.env.VITE_COINGECKO_API_KEY
+
+export const getAllCoins = async () => {
+    try {
+        const res = await axios.get(
+            'https://api.coingecko.com/api/v3/coins/list?include_platform=true'
+        )
+
+        return res.data
+    } catch (e) {
+        console.log(e)
+    }
+}
+
+export const getMarketData = async (contractAddress: string) => {
+    try {
+        const res = await axios.get(
+            `https://api.coingecko.com/api/v3/simple/token_price/ethereum?contract_addresses=${contractAddress}&vs_currencies=usd`
+            // {
+            //     headers: {
+            //         'x-cg-demo-api-key': import.meta.env.VITE_COINGECKO_API_KEY
+            //     }
+            // }
+        )
+
+        return res.data
+    } catch (e) {
+        console.log(e)
+    }
+}
+
+export const getCurrentCoin = async (id) => {
+    try {
+        const res = await axios.get(`/coins/${id}`)
+
+        return res.data
+    } catch (e) {
+        console.log(e)
+    }
+}
 

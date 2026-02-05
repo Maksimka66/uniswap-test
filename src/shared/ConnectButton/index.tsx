@@ -10,7 +10,9 @@ export default function ConnectButton({ children, className, disabled }: IConnec
         try {
             const res = await connectWallet()
 
-            dispatch(getKey(res))
+            if (res) {
+                dispatch(getKey(res))
+            }
         } catch (e) {
             console.log(e)
         }

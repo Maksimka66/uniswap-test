@@ -1,53 +1,85 @@
 import { useEffect, useState, type ChangeEvent } from 'react'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
+import { useForm } from 'react-hook-form'
+import { yupResolver } from '@hookform/resolvers/yup'
 import { useDebounce } from 'use-debounce'
 import numeral from 'numeral'
-import clsx from 'clsx'
 import ArrowDownIcon from '../../icons/ArrowDownIcon'
 import SettingsIcon from '../../icons/SettingsIcon'
 import InputWrapper from '../../shared/InputWrapper'
 import Layout from '../../shared/Layout'
 import ConnectButton from '../../shared/ConnectButton'
-import { selectAddress, selectFirstCoin, selectSecondCoin } from '../../store/slice'
+import {
+    selectAddress,
+    selectButtonId,
+    selectBuyCoin,
+    selectSellCoin,
+    setButtonId,
+    setCurrentCoin
+} from '../../store/slice'
 import SelectTokenButton from '../../shared/SelectTokenButton'
+import { getMarketData } from '../../api/coinGeckoApi'
+import Loader from '../../shared/Loader'
+import { swapTokens } from '../../api/uniswapTrader'
+import { swapSchema } from './swapSchema'
 
 export default function Exchanger() {
-    const [direction, setDirection] = useState('')
-    const [fieldFrom, setFieldFrom] = useState('')
-    const [fieldTo, setFieldTo] = useState('')
-    const [firstPrice, setFirstPrice] = useState(0)
-    const [secondPrice, setSecondPrice] = useState(0)
+    const [fieldSell, setFieldSell] = useState('')
+    const [fieldBuy, setFieldBuy] = useState('')
+    const [tokenSellPrice, setTokenSellPrice] = useState(0)
+    const [tokenBuyPrice, setTokenBuyPrice] = useState(0)
 
-    const [fieldFromValue] = useDebounce(fieldFrom, 1000)
-    const [fieldToValue] = useDebounce(fieldTo, 1000)
+    const [fieldSellValue] = useDebounce(fieldSell, 1000)
+    const [fieldBuyValue] = useDebounce(fieldBuy, 1000)
+
+    const dispatch = useDispatch()
 
     const address = useSelector(selectAddress)
-    const firstCoin = useSelector(selectFirstCoin)
-    const secondCoin = useSelector(selectSecondCoin)
+    const buttonId = useSelector(selectButtonId)
+    const tokenSell = useSelector(selectSellCoin)
+    const tokenBuy = useSelector(selectBuyCoin)
 
     useEffect(() => {
-        if (firstCoin) {
-            const {
-                market_data: {
-                    current_price: { usd }
+        if (tokenSell) {
+            const getTokenSellPrice = async () => {
+                try {
+                    const address = tokenSell.address.toLowerCase()
+
+                    const res = await getMarketData(address)
+
+                    if (res) {
+                        setTokenSellPrice(res[address].usd)
+                    }
+                } catch (e) {
+                    console.error(e)
                 }
-            } = firstCoin
+            }
 
-            setFirstPrice(usd)
+            getTokenSellPrice()
         }
+    }, [tokenSell])
 
-        if (secondCoin) {
-            const {
-                market_data: {
-                    current_price: { usd }
+    useEffect(() => {
+        if (tokenBuy) {
+            const getTokenBuyPrice = async () => {
+                try {
+                    const address = tokenBuy.address.toLowerCase()
+
+                    const res = await getMarketData(address)
+
+                    if (res) {
+                        setTokenBuyPrice(res[address].usd)
+                    }
+                } catch (e) {
+                    console.error(e)
                 }
-            } = secondCoin
+            }
 
-            setSecondPrice(usd)
+            getTokenBuyPrice()
         }
-    }, [firstCoin, secondCoin])
+    }, [tokenBuy])
 
-    const calculatePrice = (value: string, coin: number) => {
+    function calculatePrice(value: string, coin: number) {
         if (coin) {
             return numeral(+value * coin)
                 .format('($0.00a)')
@@ -57,11 +89,73 @@ export default function Exchanger() {
         }
     }
 
-    const toggleDirection = () => {
-        if (!direction) {
-            setDirection('flex-col-reverse')
-        } else {
-            setDirection('')
+    function toogleStates() {
+        if (buttonId === 'sell') {
+            const previousCoin = tokenSell
+            const previousFieldValue = fieldSell
+
+            dispatch(setCurrentCoin(tokenBuy))
+            dispatch(setButtonId('buy'))
+            dispatch(setCurrentCoin(previousCoin))
+
+            setFieldBuy(previousFieldValue)
+            setFieldSell(fieldBuy)
+        }
+
+        if (buttonId === 'buy') {
+            const previousCoin = tokenBuy
+            const previousFieldValue = fieldBuy
+
+            dispatch(setCurrentCoin(tokenSell))
+            dispatch(setButtonId('sell'))
+            dispatch(setCurrentCoin(previousCoin))
+
+            setFieldSell(previousFieldValue)
+            setFieldBuy(fieldSell)
+        }
+    }
+
+    const handleChange = (e: ChangeEvent) => {
+        const value = (e.target as HTMLInputElement).value.trim()
+
+        if (e.target.id === 'sell') {
+            setFieldSell(value)
+
+            if (tokenBuyPrice) {
+                const calculatedToken = ((+value * +tokenSellPrice) / +tokenBuyPrice).toFixed(3)
+
+                if (+calculatedToken) {
+                    setFieldBuy(calculatedToken)
+                } else {
+                    setFieldBuy('')
+                }
+            }
+        }
+
+        if (e.target.id === 'buy') {
+            setFieldBuy(value)
+
+            if (tokenSellPrice) {
+                const calculatedToken = ((+value * +tokenBuyPrice) / +tokenSellPrice).toFixed(3)
+
+                if (+calculatedToken) {
+                    setFieldSell(calculatedToken)
+                } else {
+                    setFieldSell('')
+                }
+            }
+        }
+    }
+
+    const swap = async () => {
+        try {
+            if (tokenSell && tokenBuy && fieldSell) {
+                const res = await swapTokens(fieldSell, tokenSell, tokenBuy)
+
+                console.log(res)
+            }
+        } catch (e) {
+            console.error(e.message)
         }
     }
 
@@ -78,54 +172,56 @@ export default function Exchanger() {
             <p className='mb-10 text-left font-dm font-medium text-[14px] leading-[18px] text-description-text'>
                 Easy way to trade your tokens
             </p>
-            <div className={clsx('flex flex-col items-center mb-6', direction)}>
+            <div className={'flex flex-col items-center mb-6'}>
                 <InputWrapper
-                    label='From'
-                    value={fieldFrom}
-                    debouncedValue={calculatePrice(fieldFromValue, firstPrice)}
+                    id={'sell'}
+                    label='Sell'
+                    value={fieldSell}
+                    debouncedValue={calculatePrice(fieldSellValue, tokenSellPrice)}
                     inputClassName='placeholder:text-[18px] leading-[24px]'
                     placeholder='0.0'
-                    handleChange={(e: ChangeEvent) =>
-                        setFieldFrom((e.target as HTMLInputElement).value.replace(/[^0-9]/g, ''))
-                    }
+                    handleChange={handleChange}
+                    disabled={!tokenSell ? true : false}
                 >
                     <SelectTokenButton
-                        currentCoin={firstCoin}
-                        buttonId={1}
+                        currentCoin={tokenSell}
                         className='px-3 py-1.5 rounded-[98px]'
+                        buttonId={'sell'}
                     />
                 </InputWrapper>
 
-                <button className='my-4' onClick={toggleDirection}>
+                <button className='my-4' onClick={toogleStates}>
                     <ArrowDownIcon />
                 </button>
                 <InputWrapper
-                    label='To'
-                    value={fieldTo}
-                    debouncedValue={calculatePrice(fieldToValue, secondPrice)}
+                    id={'buy'}
+                    label='Buy'
+                    value={fieldBuy}
+                    debouncedValue={calculatePrice(fieldBuyValue, tokenBuyPrice)}
                     placeholder='0.0'
                     inputClassName='placeholder:text-[18px] leading-[24px]'
-                    handleChange={(e: ChangeEvent) =>
-                        setFieldTo((e.target as HTMLInputElement).value.replace(/[^0-9]/g, ''))
-                    }
+                    handleChange={handleChange}
+                    disabled={!tokenBuy ? true : false}
                 >
                     <SelectTokenButton
-                        currentCoin={secondCoin}
-                        buttonId={2}
+                        currentCoin={tokenBuy}
                         className='px-3 py-1.5 rounded-[98px]'
+                        buttonId={'buy'}
                     />
                 </InputWrapper>
             </div>
             {address ? (
-                <button className='rounded-[10px] font-medium font-dm w-full py-[16px] bg-[#FFF1F2] text-[#F43F5E] text-[18px] leading-[24px]'>
+                <button
+                    className='rounded-[10px] font-medium font-dm w-full py-[16px] bg-[#FFF1F2] text-[#F43F5E] text-[18px] leading-[24px]'
+                    onClick={swap}
+                >
                     Add funds to swap
                 </button>
             ) : (
-                <ConnectButton className='w-full py-[16px] bg-[#FFF1F2] text-[#F43F5E] text-[18px] leading-[24px]'>
+                <button className='w-full py-[16px] bg-[#FFF1F2] text-[#F43F5E] text-[18px] leading-[24px]'>
                     Connect a wallet
-                </ConnectButton>
+                </button>
             )}
         </Layout>
     )
 }
-

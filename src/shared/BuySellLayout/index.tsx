@@ -7,20 +7,39 @@ import Layout from '../Layout'
 import SelectTokenButton from '../SelectTokenButton'
 import ConnectButton from '../ConnectButton'
 import SwitchIcon from '../../icons/SwitchIcon'
-import { selectAddress, selectFirstCoin } from '../../store/slice'
+import { selectAddress, selectAllCoins, selectSellCoin } from '../../store/slice'
+// import { useLazyGetAllCoinsQuery } from '../../api/coinGeckoApi'
+import Loader from '../Loader'
 
 export default function BuySellLayout({ pageLabel, data, disabled }) {
     const [amount, setAmount] = useState('')
     const [coinPrice, setCoinPrice] = useState(0)
+
+    const [swithed, setSwitched] = useState(false)
+
+    // const [fetchCoins, { isFetching }] = useLazyGetAllCoinsQuery()
 
     const [debouncedAmount] = useDebounce(amount, 1000)
 
     const id = useId()
 
     const address = useSelector(selectAddress)
-    const coin = useSelector(selectFirstCoin)
+    const allCoins = useSelector(selectAllCoins)
+    const coin = useSelector(selectSellCoin)
 
     useEffect(() => {
+        async function getCoins() {
+            try {
+                if (!allCoins.length) {
+                    // await fetchCoins({})
+                }
+            } catch (e) {
+                console.error(e)
+            }
+        }
+
+        getCoins()
+
         if (coin) {
             const {
                 market_data: {
@@ -30,7 +49,7 @@ export default function BuySellLayout({ pageLabel, data, disabled }) {
 
             setCoinPrice(usd)
         }
-    }, [coin])
+    }, [allCoins.length, coin])
 
     const calculatePrice = (value: string, coinPrice: number) => {
         if (coin) {
@@ -42,9 +61,13 @@ export default function BuySellLayout({ pageLabel, data, disabled }) {
         }
     }
 
-    // const handleSwitch = () => {
-    //     setAmount(parseFloat(calculatePrice(debouncedAmount, coinPrice)))
-    //     setCoinPrice(coinPrice)
+    const handleSwitch = () => {
+        setSwitched(!swithed)
+        console.log(swithed)
+    }
+
+    // if (isFetching) {
+    //     return <Loader />
     // }
 
     return (
@@ -77,15 +100,13 @@ export default function BuySellLayout({ pageLabel, data, disabled }) {
                         />
                     </div>
                     {!amount || amount === '$0' ? (
-                        <ul className='flex justify-center items-center gap-[8px]'>
+                        <ul className='flex justify-center items-center gap-[8px] mb-[24px]'>
                             {data.map((item) => (
                                 <li key={item.id}>
                                     <DefaultAmountButton
                                         disabled={disabled}
                                         handleClick={(e: MouseEvent) =>
-                                            setAmount(
-                                                `${(e.target as HTMLButtonElement).textContent}`
-                                            )
+                                            setAmount((e.target as HTMLButtonElement).textContent)
                                         }
                                     >
                                         {item.content}
@@ -98,15 +119,15 @@ export default function BuySellLayout({ pageLabel, data, disabled }) {
                             <p className='font-dm font-[485] leading-[22px] text-center text-[#131313a1] text-[16px]'>
                                 {calculatePrice(debouncedAmount, coinPrice)}
                             </p>
-                            {/* <button onClick={handleSwitch}>
+                            <button onClick={handleSwitch}>
                                 <SwitchIcon />
-                            </button> */}
+                            </button>
                         </div>
                     )}
                 </div>
             </Layout>
             <SelectTokenButton
-                buttonId={1}
+                buttonId={'1'}
                 currentCoin={coin}
                 className='w-1/4 p-[16px] rounded-[16px]'
             />
