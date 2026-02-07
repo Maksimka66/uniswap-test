@@ -1,13 +1,26 @@
 import { createSlice } from '@reduxjs/toolkit'
+import type { IToken } from '../interfaces/ITokens/ITokens'
 
-const initialState = {
+interface IState {
+    address: string
+    allCoins: IToken[]
+    filteredCoins: IToken[]
+    buttonId: string
+    sellCoin: IToken | null
+    buyCoin: IToken | null
+    isModalOpen: boolean
+    loader: boolean
+}
+
+const initialState: IState = {
     address: '',
     allCoins: [],
     filteredCoins: [],
     buttonId: '',
     sellCoin: null,
     buyCoin: null,
-    isModalOpen: false
+    isModalOpen: false,
+    loader: false
 }
 
 const keySlice = createSlice({
@@ -20,7 +33,8 @@ const keySlice = createSlice({
         selectButtonId: (state) => state.buttonId,
         selectSellCoin: (state) => state.sellCoin,
         selectBuyCoin: (state) => state.buyCoin,
-        selectIsModalOpen: (state) => state.isModalOpen
+        selectIsModalOpen: (state) => state.isModalOpen,
+        selectLoader: (state) => state.loader
     },
     reducers: {
         getKey(state, { payload }) {
@@ -31,6 +45,9 @@ const keySlice = createSlice({
         },
         modalWindowToogle(state, { payload }) {
             state.isModalOpen = payload
+        },
+        loaderToogle(state, { payload }) {
+            state.loader = payload
         },
         setCoins(state, { payload }) {
             state.allCoins = payload
@@ -70,7 +87,8 @@ export const {
     setCoins,
     setFilteredCoins,
     setButtonId,
-    setCurrentCoin
+    setCurrentCoin,
+    loaderToogle
 } = keySlice.actions
 
 export const {
@@ -80,7 +98,8 @@ export const {
     selectButtonId,
     selectSellCoin,
     selectBuyCoin,
-    selectIsModalOpen
+    selectIsModalOpen,
+    selectLoader
 } = keySlice.selectors
 
 export default keySlice.reducer

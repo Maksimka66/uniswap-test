@@ -1,18 +1,17 @@
 import { useEffect, useState, type ChangeEvent } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { useForm } from 'react-hook-form'
-import { yupResolver } from '@hookform/resolvers/yup'
 import { useDebounce } from 'use-debounce'
 import numeral from 'numeral'
 import ArrowDownIcon from '../../icons/ArrowDownIcon'
 import SettingsIcon from '../../icons/SettingsIcon'
 import InputWrapper from '../../shared/InputWrapper'
 import Layout from '../../shared/Layout'
-import ConnectButton from '../../shared/ConnectButton'
 import {
+    loaderToogle,
     selectAddress,
     selectButtonId,
     selectBuyCoin,
+    selectLoader,
     selectSellCoin,
     setButtonId,
     setCurrentCoin
@@ -21,7 +20,6 @@ import SelectTokenButton from '../../shared/SelectTokenButton'
 import { getMarketData } from '../../api/coinGeckoApi'
 import Loader from '../../shared/Loader'
 import { swapTokens } from '../../api/uniswapTrader'
-import { swapSchema } from './swapSchema'
 
 export default function Exchanger() {
     const [fieldSell, setFieldSell] = useState('')
@@ -38,11 +36,14 @@ export default function Exchanger() {
     const buttonId = useSelector(selectButtonId)
     const tokenSell = useSelector(selectSellCoin)
     const tokenBuy = useSelector(selectBuyCoin)
+    const loader = useSelector(selectLoader)
 
     useEffect(() => {
         if (tokenSell) {
             const getTokenSellPrice = async () => {
                 try {
+                    dispatch(loaderToogle(true))
+
                     const address = tokenSell.address.toLowerCase()
 
                     const res = await getMarketData(address)
@@ -51,18 +52,24 @@ export default function Exchanger() {
                         setTokenSellPrice(res[address].usd)
                     }
                 } catch (e) {
-                    console.error(e)
+                    if (e instanceof Error) {
+                        console.log(e.message)
+                    }
+                } finally {
+                    dispatch(loaderToogle(false))
                 }
             }
 
             getTokenSellPrice()
         }
-    }, [tokenSell])
+    }, [dispatch, tokenSell])
 
     useEffect(() => {
         if (tokenBuy) {
             const getTokenBuyPrice = async () => {
                 try {
+                    dispatch(loaderToogle(true))
+
                     const address = tokenBuy.address.toLowerCase()
 
                     const res = await getMarketData(address)
@@ -71,13 +78,17 @@ export default function Exchanger() {
                         setTokenBuyPrice(res[address].usd)
                     }
                 } catch (e) {
-                    console.error(e)
+                    if (e instanceof Error) {
+                        console.log(e.message)
+                    }
+                } finally {
+                    dispatch(loaderToogle(false))
                 }
             }
 
             getTokenBuyPrice()
         }
-    }, [tokenBuy])
+    }, [dispatch, tokenBuy])
 
     function calculatePrice(value: string, coin: number) {
         if (coin) {
@@ -116,7 +127,12 @@ export default function Exchanger() {
     }
 
     const handleChange = (e: ChangeEvent) => {
-        const value = (e.target as HTMLInputElement).value.trim()
+        const value = (e.target as HTMLInputElement).value
+            .trim()
+            .replace(/[^\d.,]/g, '')
+            .replace(/([.,])(.*)\1/g, '$1$2')
+            .replace(/^0+(?=\d)/, '')
+            .replace(/^[.,]/, '')
 
         if (e.target.id === 'sell') {
             setFieldSell(value)
@@ -155,8 +171,14 @@ export default function Exchanger() {
                 console.log(res)
             }
         } catch (e) {
-            console.error(e.message)
+            if (e instanceof Error) {
+                console.log(e.message)
+            }
         }
+    }
+
+    if (loader) {
+        return <Loader />
     }
 
     return (
@@ -212,13 +234,13 @@ export default function Exchanger() {
             </div>
             {address ? (
                 <button
-                    className='rounded-[10px] font-medium font-dm w-full py-[16px] bg-[#FFF1F2] text-[#F43F5E] text-[18px] leading-[24px]'
+                    className='rounded-[10px] font-medium font-dm w-full py-4 bg-[#FFF1F2] text-[#F43F5E] text-[18px] leading-6'
                     onClick={swap}
                 >
                     Add funds to swap
                 </button>
             ) : (
-                <button className='w-full py-[16px] bg-[#FFF1F2] text-[#F43F5E] text-[18px] leading-[24px]'>
+                <button className='w-full py-4 bg-[#FFF1F2] text-[#F43F5E] text-[18px] leading-6'>
                     Connect a wallet
                 </button>
             )}

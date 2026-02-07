@@ -1,6 +1,8 @@
+import type { IToken } from '../ITokens/ITokens'
+
 export interface ISelectTokenButton {
     className: string
     buttonId: string
-    // currentCoin: object
+    currentCoin: IToken | null
 }
 

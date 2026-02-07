@@ -12,7 +12,9 @@ export const getAllCoins = async () => {
 
         return res.data
     } catch (e) {
-        console.log(e)
+        if (e instanceof Error) {
+            console.log(e.message)
+        }
     }
 }
 
@@ -29,17 +31,21 @@ export const getMarketData = async (contractAddress: string) => {
 
         return res.data
     } catch (e) {
-        console.log(e)
+        if (e instanceof Error) {
+            console.log(e.message)
+        }
     }
 }
 
-export const getCurrentCoin = async (id) => {
+export const getCurrentCoin = async (id: string) => {
     try {
         const res = await axios.get(`/coins/${id}`)
 
         return res.data
     } catch (e) {
-        console.log(e)
+        if (e instanceof Error) {
+            console.log(e.message)
+        }
     }
 }
 

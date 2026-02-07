@@ -1,10 +1,11 @@
-import { ethers } from 'ethers'
+import { Contract, ethers, FeeData, Wallet, type InterfaceAbi } from 'ethers'
 import FACTORY_ABI from '../abis/factory.json' assert { type: 'json' }
 import QUOTER_ABI from '../abis/quoter.json' assert { type: 'json' }
 import SWAP_ROUTER_ABI from '../abis/swaprouter.json' assert { type: 'json' }
 import POOL_ABI from '../abis/pool.json' assert { type: 'json' }
 import TOKEN_IN_ABI from '../abis/tokenIn.json' assert { type: 'json' }
 import { walletBalance } from './connectWalletApi'
+import type { IPoolInfo, IParams, IToken } from '../interfaces/ITokens/ITokens'
 
 const testnet = import.meta.env.VITE_TESTNET
 
@@ -20,7 +21,12 @@ const quoterContract = new ethers.Contract(QUOTER_CONTRACT_ADDRESS, QUOTER_ABI, 
 
 const signer = new ethers.Wallet(import.meta.env.VITE_CURRENT_ADDRESS_SECRET_KEY, provider)
 
-async function approveToken(tokenIn, tokenABI, amount, wallet) {
+async function approveToken(
+    tokenIn: IToken,
+    tokenABI: InterfaceAbi,
+    amount: bigint,
+    wallet: Wallet
+) {
     const { address: tokenAddress, decimals } = tokenIn
 
     try {
@@ -47,17 +53,24 @@ async function approveToken(tokenIn, tokenABI, amount, wallet) {
             console.log('Approval Transaction Confirmed!')
         }
     } catch (e) {
-        console.error('An error occurred during token approval:', e.message)
-        throw new Error('Token approval failed')
+        if (e instanceof Error) {
+            console.error('An error occurred during token approval:', e.message)
+
+            throw new Error('Token approval failed')
+        }
     }
 }
 
-async function getPoolInfo(factoryContract, tokenIn, tokenOut) {
+async function getPoolInfo(
+    factoryContract: Contract,
+    tokenIn: IToken,
+    tokenOut: IToken
+): Promise<IPoolInfo> {
     try {
         const poolAddress = await factoryContract.getPool(tokenIn.address, tokenOut.address, 3000)
 
         if (!poolAddress) {
-            throw new Error('Failed to get pool address')
+            throw new Error('No pool for such pair of tokens!')
         }
 
         const poolContract = new ethers.Contract(poolAddress, POOL_ABI, provider)
@@ -68,15 +81,24 @@ async function getPoolInfo(factoryContract, tokenIn, tokenOut) {
             poolContract.fee()
         ])
 
-        console.log(token0)
-
         return { poolContract, token0, token1, fee }
     } catch (e) {
-        console.error('An error occurred:', e.message)
+        if (e instanceof Error) {
+            console.error('An error occurred:', e.message)
+        }
+
+        throw e
     }
 }
 
-async function quoteAndLogSwap(quoterContract, fee, signer, amountIn, tokenIn, tokenOut) {
+async function quoteAndLogSwap(
+    quoterContract: Contract,
+    fee: FeeData,
+    signer: Wallet,
+    amountIn: bigint,
+    tokenIn: IToken,
+    tokenOut: IToken
+) {
     try {
         const quotedAmountOut = await quoterContract.quoteExactInputSingle.staticCall({
             tokenIn: tokenIn.address,
@@ -92,39 +114,66 @@ async function quoteAndLogSwap(quoterContract, fee, signer, amountIn, tokenIn, t
 
         return amountOut
     } catch (e) {
-        console.error('An error occurred:', e.message)
+        if (e instanceof Error) {
+            console.error('An error occurred:', e.message)
+        }
     }
 }
 
-async function prepareSwapParams(poolContract, signer, amountIn, amountOut, tokenIn, tokenOut) {
-    const fee = await poolContract.fee()
+async function prepareSwapParams(
+    poolContract: Contract,
+    signer: Wallet,
+    amountIn: bigint,
+    amountOut: string,
+    tokenIn: IToken,
+    tokenOut: IToken
+): Promise<IParams> {
+    try {
+        const fee = await poolContract?.fee()
 
-    if (fee) {
+        if (!fee) {
+            throw new Error('No such fee for this transaction!')
+        }
+
         return {
             tokenIn: tokenIn.address,
             tokenOut: tokenOut.address,
             fee,
             recipient: signer.address,
-            amountIn: amountIn,
+            amountIn,
             amountOutMinimum: amountOut,
             sqrtPriceLimitX96: 0
+        }
+    } catch (e) {
+        if (e instanceof Error) {
+            console.error('An error occurred:', e.message)
+        }
+
+        throw e
+    }
+}
+
+async function executeSwap(swapRouter: Contract, params: IParams, signer: Wallet) {
+    try {
+        const transaction = await swapRouter.exactInputSingle.populateTransaction(params)
+
+        await signer.sendTransaction(transaction)
+    } catch (e) {
+        if (e instanceof Error) {
+            console.error('An error occurred:', e.message, 'Transaction has been failed!')
         }
     }
 }
 
-async function executeSwap(swapRouter, params, signer) {
-    const transaction = await swapRouter.exactInputSingle.populateTransaction(params)
-
-    await signer.sendTransaction(transaction)
-}
-
-export async function swapTokens(swapAmount, tokenIn, tokenOut) {
+export async function swapTokens(swapAmount: string, tokenIn: IToken, tokenOut: IToken) {
     const amountIn = ethers.parseUnits(swapAmount.toString(), tokenIn.decimals)
 
     try {
         await approveToken(tokenIn, TOKEN_IN_ABI, amountIn, signer)
 
         const { poolContract, fee } = await getPoolInfo(factoryContract, tokenIn, tokenOut)
+
+        console.log(poolContract, fee)
 
         const quotedAmountOut = await quoteAndLogSwap(
             quoterContract,
@@ -135,24 +184,28 @@ export async function swapTokens(swapAmount, tokenIn, tokenOut) {
             tokenOut
         )
 
-        const params = await prepareSwapParams(
-            poolContract,
-            signer,
-            amountIn,
-            quotedAmountOut[0].toString(),
-            tokenIn,
-            tokenOut
-        )
+        if (quotedAmountOut) {
+            const params = await prepareSwapParams(
+                poolContract,
+                signer,
+                amountIn,
+                quotedAmountOut[0].toString(),
+                tokenIn,
+                tokenOut
+            )
 
-        const swapRouter = new ethers.Contract(
-            SWAP_ROUTER_CONTRACT_ADDRESS,
-            SWAP_ROUTER_ABI,
-            signer
-        )
+            const swapRouter = new ethers.Contract(
+                SWAP_ROUTER_CONTRACT_ADDRESS,
+                SWAP_ROUTER_ABI,
+                signer
+            )
 
-        await executeSwap(swapRouter, params, signer)
+            await executeSwap(swapRouter, params, signer)
+        }
     } catch (e) {
-        console.error('An error occurred:', e.message)
+        if (e instanceof Error) {
+            console.error('An error occurred:', e.message)
+        }
     }
 }
 

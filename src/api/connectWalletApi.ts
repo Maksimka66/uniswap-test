@@ -1,4 +1,4 @@
-import { ethers } from 'ethers'
+import { Contract, ethers } from 'ethers'
 
 const provider = new ethers.BrowserProvider(window.ethereum)
 
@@ -14,7 +14,9 @@ export async function connectWallet() {
 
         return address[0]
     } catch (e) {
-        console.error(e)
+        if (e instanceof Error) {
+            console.log(e.message)
+        }
     }
 }
 
@@ -24,21 +26,23 @@ export async function getSigner() {
 
         return signer
     } catch (e) {
-        console.error(e.message)
+        if (e instanceof Error) {
+            console.log(e.message)
+        }
     }
 }
 
-export async function walletBalance(tokenContract, decimals: number) {
+export async function walletBalance(tokenContract: Contract, decimals: number) {
     try {
         const balance = await tokenContract.balanceOf(address)
 
         const formattedBalance = ethers.formatUnits(balance, decimals)
 
-        console.log(+formattedBalance)
-
         return +formattedBalance
     } catch (e) {
-        console.error('An error occurred:', e.message)
+        if (e instanceof Error) {
+            console.error('An error occurred:', e.message)
+        }
     }
 }
 

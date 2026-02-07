@@ -6,6 +6,7 @@ import { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { getTokens } from '../../api/uniswapApi'
 import { selectAllCoins, setCoins, setFilteredCoins } from '../../store/slice'
+import type { IToken } from '../../interfaces/ITokens/ITokens'
 
 export default function SwapPage() {
     const dispatch = useDispatch()
@@ -18,12 +19,14 @@ export default function SwapPage() {
                 try {
                     const res = await getTokens()
 
-                    const ethereumTokens = res.tokens.filter((token) => token.chainId === 1)
+                    const ethereumTokens = res.tokens.filter((token: IToken) => token.chainId === 1)
 
                     dispatch(setCoins(ethereumTokens))
                     dispatch(setFilteredCoins(ethereumTokens))
                 } catch (e) {
-                    console.log(e)
+                    if (e instanceof Error) {
+                        console.log(e.message)
+                    }
                 }
             }
 
@@ -44,4 +47,3 @@ export default function SwapPage() {
         </>
     )
 }
-

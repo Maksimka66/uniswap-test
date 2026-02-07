@@ -2,8 +2,6 @@ import { useDispatch } from 'react-redux'
 import clsx from 'clsx'
 import DropDownIcon from '../../icons/DropDownIcon'
 import { modalWindowToogle, setButtonId } from '../../store/slice'
-// import { useLazyGetCurrentCoinQuery } from '../../api/coinGeckoApi'
-// import Loader from '../Loader'
 import type { ISelectTokenButton } from '../../interfaces/ISelectTokenButton/ISelectTokenButton'
 import type { MouseEventHandler } from 'react'
 
@@ -21,7 +19,7 @@ export default function SelectTokenButton({
 
     return (
         <button
-            className={`text-[14px] leading-[18px] font-medium font-dm flex items-center gap-[8px] ${
+            className={`text-[14px] leading-[18px] font-medium font-dm flex items-center gap-2 ${
                 currentCoin
                     ? clsx(
                           'bg-white border border-[#f2f2f2] shadow-[0_0_10px_#1313130a]',

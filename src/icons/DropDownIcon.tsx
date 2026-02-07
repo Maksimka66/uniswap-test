@@ -1,4 +1,6 @@
-export default function DropDownIcon({ color, width, height }) {
+import type { IDropDownIcon } from '../interfaces/IDropDownIcon/IDropDownIcon'
+
+export default function DropDownIcon({ color, width, height }: IDropDownIcon) {
     return (
         <svg
             width={width}
@@ -14,4 +16,3 @@ export default function DropDownIcon({ color, width, height }) {
         </svg>
     )
 }
-

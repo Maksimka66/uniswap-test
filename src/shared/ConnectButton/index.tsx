@@ -14,7 +14,9 @@ export default function ConnectButton({ children, className, disabled }: IConnec
                 dispatch(getKey(res))
             }
         } catch (e) {
-            console.log(e)
+            if (e instanceof Error) {
+                console.log(e.message)
+            }
         }
     }
 

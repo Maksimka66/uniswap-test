@@ -1,80 +1,61 @@
-import { useEffect, useId, useState, type ChangeEvent, type MouseEvent } from 'react'
+import { useId, useState, type ChangeEvent } from 'react'
 import { useSelector } from 'react-redux'
-import { useDebounce } from 'use-debounce'
+// import { useDebounce } from 'use-debounce'
 import numeral from 'numeral'
-import DefaultAmountButton from '../DefaultAmountButton'
+// import DefaultAmountButton from '../DefaultAmountButton'
 import Layout from '../Layout'
 import SelectTokenButton from '../SelectTokenButton'
 import ConnectButton from '../ConnectButton'
 import SwitchIcon from '../../icons/SwitchIcon'
-import { selectAddress, selectAllCoins, selectSellCoin } from '../../store/slice'
-// import { useLazyGetAllCoinsQuery } from '../../api/coinGeckoApi'
-import Loader from '../Loader'
+import { selectAddress, selectSellCoin } from '../../store/slice'
+import type { IBuySellLayout } from '../../interfaces/IBuySellLayout/IBuySellLayout'
 
-export default function BuySellLayout({ pageLabel, data, disabled }) {
+export default function BuySellLayout({ pageLabel, data }: IBuySellLayout) {
     const [amount, setAmount] = useState('')
-    const [coinPrice, setCoinPrice] = useState(0)
+    // const [coinPrice, setCoinPrice] = useState(0)
 
     const [swithed, setSwitched] = useState(false)
 
-    // const [fetchCoins, { isFetching }] = useLazyGetAllCoinsQuery()
-
-    const [debouncedAmount] = useDebounce(amount, 1000)
+    // const [debouncedAmount] = useDebounce(amount, 1000)
 
     const id = useId()
 
     const address = useSelector(selectAddress)
-    const allCoins = useSelector(selectAllCoins)
+    // const allCoins = useSelector(selectAllCoins)
     const coin = useSelector(selectSellCoin)
 
-    useEffect(() => {
-        async function getCoins() {
-            try {
-                if (!allCoins.length) {
-                    // await fetchCoins({})
-                }
-            } catch (e) {
-                console.error(e)
-            }
-        }
+    // useEffect(() => {
+    //     if (coin) {
+    //         const {
+    //             market_data: {
+    //                 current_price: { usd }
+    //             }
+    //         } = coin
 
-        getCoins()
+    //         setCoinPrice(usd)
+    //     }
+    // }, [allCoins.length, coin])
 
-        if (coin) {
-            const {
-                market_data: {
-                    current_price: { usd }
-                }
-            } = coin
+    // const calculatePrice = (value: string, coinPrice: number) => {
+    //     if (coin) {
+    //         const num = value.slice(1)
 
-            setCoinPrice(usd)
-        }
-    }, [allCoins.length, coin])
-
-    const calculatePrice = (value: string, coinPrice: number) => {
-        if (coin) {
-            const num = value.slice(1)
-
-            if (value[0] === '$') {
-                return `${(+num / coinPrice).toFixed(4)} ${coin.id}`.toUpperCase()
-            }
-        }
-    }
+    //         if (value[0] === '$') {
+    //             return `${(+num / coinPrice).toFixed(4)} ${coin.id}`.toUpperCase()
+    //         }
+    //     }
+    // }
 
     const handleSwitch = () => {
         setSwitched(!swithed)
         console.log(swithed)
     }
 
-    // if (isFetching) {
-    //     return <Loader />
-    // }
-
     return (
-        <div className='w-full flex flex-col items-center gap-[8px]'>
+        <div className='w-full flex flex-col items-center gap-2'>
             <Layout>
                 <div>
-                    <div className='mb-[24px] flex justify-between items-center'>
+                    <div className='mb-6 flex justify-between items-center'>
                         <label
                             htmlFor={id}
                             className='font-dm font-[485] text-[14px] leading-[18px] text-[#131313A1]'
@@ -83,7 +64,7 @@ export default function BuySellLayout({ pageLabel, data, disabled }) {
                         </label>
                         <button>COUNTRY</button>
                     </div>
-                    <div className='flex items-center justify-center gap-[4px] mb-[20px]'>
+                    <div className='flex items-center justify-center gap-1 mb-5'>
                         <input
                             id={id}
                             value={amount}
@@ -100,24 +81,24 @@ export default function BuySellLayout({ pageLabel, data, disabled }) {
                         />
                     </div>
                     {!amount || amount === '$0' ? (
-                        <ul className='flex justify-center items-center gap-[8px] mb-[24px]'>
+                        <ul className='flex justify-center items-center gap-2 mb-6'>
                             {data.map((item) => (
                                 <li key={item.id}>
-                                    <DefaultAmountButton
+                                    {/* <DefaultAmountButton
                                         disabled={disabled}
                                         handleClick={(e: MouseEvent) =>
                                             setAmount((e.target as HTMLButtonElement).textContent)
                                         }
                                     >
                                         {item.content}
-                                    </DefaultAmountButton>
+                                    </DefaultAmountButton> */}
                                 </li>
                             ))}
                         </ul>
                     ) : (
-                        <div className='flex justify-center gap-[6px] items-center'>
+                        <div className='flex justify-center gap-1.5 items-center'>
                             <p className='font-dm font-[485] leading-[22px] text-center text-[#131313a1] text-[16px]'>
-                                {calculatePrice(debouncedAmount, coinPrice)}
+                                {/* {calculatePrice(debouncedAmount, coinPrice)} */}
                             </p>
                             <button onClick={handleSwitch}>
                                 <SwitchIcon />
@@ -129,10 +110,10 @@ export default function BuySellLayout({ pageLabel, data, disabled }) {
             <SelectTokenButton
                 buttonId={'1'}
                 currentCoin={coin}
-                className='w-1/4 p-[16px] rounded-[16px]'
+                className='w-1/4 p-4 rounded-2xl'
             />
             <ConnectButton
-                className='w-1/4 py-[16px] bg-[#FFF1F2] text-[#F43F5E] text-[18px] leading-[24px]'
+                className='w-1/4 py-4 bg-[#FFF1F2] text-[#F43F5E] text-[18px] leading-6'
                 disabled={!address || !amount ? true : false}
             >
                 {!address ? (

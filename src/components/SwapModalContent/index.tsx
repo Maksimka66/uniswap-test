@@ -1,6 +1,5 @@
 import { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import type { ICoinInfo } from '../../interfaces/ICoinInfo/ICoinInfo'
 import {
     modalWindowToogle,
     selectAllCoins,
@@ -10,7 +9,7 @@ import {
 } from '../../store/slice'
 import InputFilter from '../InputFilter'
 import CloseButton from '../../shared/CloseButton/CloseButton'
-// import Loader from '../../shared/Loader'
+import type { IToken } from '../../interfaces/ITokens/ITokens'
 
 export default function SwapModalContent() {
     const coins = useSelector(selectAllCoins)
@@ -19,7 +18,7 @@ export default function SwapModalContent() {
     const dispatch = useDispatch()
 
     const applyCoin = (address: string) => {
-        const currentCoin = coins.find((coin: ICoinInfo) => address === coin.address)
+        const currentCoin = coins.find((coin: IToken) => address === coin.address)
 
         if (currentCoin) {
             dispatch(setCurrentCoin(currentCoin))
@@ -44,7 +43,7 @@ export default function SwapModalContent() {
             </div>
             <ul>
                 {filteredCoins.length ? (
-                    filteredCoins.map((coin: ICoinInfo, i) => (
+                    filteredCoins.map((coin: IToken, i) => (
                         <li key={i} className='py-0.5'>
                             <button
                                 className='w-full flex gap-4 items-center transition duration-300 ease-in-out hover:bg-[#d4d9e1] p-2 rounded-2xl'
