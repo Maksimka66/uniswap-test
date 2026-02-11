@@ -1,25 +1,7 @@
-import { type ChangeEvent } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import SearchIcon from '../../icons/SearchIcon'
-import { selectAllCoins, setFilteredCoins } from '../../store/slice'
+import SearchIcon from '../../icons/SearchIcon';
+import type { IInputFilter } from '../../interfaces/IInputFilter/IInputFilter';
 
-export default function InputFilter() {
-    const dispatch = useDispatch()
-
-    const coins = useSelector(selectAllCoins)
-
-    const handleFilter = (e: ChangeEvent) => {
-        const value = (e.target as HTMLInputElement).value
-
-        const filteredCoins = coins.filter(
-            (coin) =>
-                coin.name.toLowerCase().includes(value.toLowerCase()) ||
-                coin.symbol.toLowerCase().includes(value.toLowerCase())
-        )
-
-        dispatch(setFilteredCoins(filteredCoins))
-    }
-
+export default function InputFilter({ handleFilter }: IInputFilter) {
     return (
         <div className='mb-3 flex items-center gap-3 relative p-4 rounded-[999px] bg-[#f9f9f9]'>
             <SearchIcon />
@@ -30,6 +12,5 @@ export default function InputFilter() {
                 onChange={handleFilter}
             />
         </div>
-    )
+    );
 }
-

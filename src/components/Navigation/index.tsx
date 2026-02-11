@@ -1,9 +1,9 @@
-import { NavLink, useLocation } from 'react-router-dom'
-import clsx from 'clsx'
-import type { ILinks, INav } from '../../interfaces/INav/INav'
+import { NavLink, useLocation } from 'react-router-dom';
+import clsx from 'clsx';
+import type { ILinks, INav } from '../../interfaces/INav/INav';
 
 export default function Navigation({ links }: INav) {
-    const { pathname } = useLocation()
+    const { pathname } = useLocation();
 
     return (
         <nav className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2'>
@@ -13,8 +13,10 @@ export default function Navigation({ links }: INav) {
                         <NavLink
                             to={link.to}
                             className={clsx(
-                                'font-dm font-medium text-[16px] leading-[20px]',
-                                pathname === link.to ? 'text-current-link' : 'text-description-text'
+                                'font-dm font-medium text-[16px] leading-5',
+                                pathname === link.to
+                                    ? 'py-px text-current-link border-b-2 border-[#4aeb45]'
+                                    : 'text-description-text'
                             )}
                         >
                             {link.name}
@@ -23,6 +25,5 @@ export default function Navigation({ links }: INav) {
                 ))}
             </ul>
         </nav>
-    )
+    );
 }
-

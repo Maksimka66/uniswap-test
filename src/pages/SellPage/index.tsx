@@ -1,7 +1,7 @@
-import Header from '../../components/Header'
-import SwapModalContent from '../../components/SwapModalContent'
-import BuySellLayout from '../../shared/BuySellLayout'
-import ModalWindow from '../../shared/ModalWindow'
+import Header from '../../components/Header';
+import SwapTokensModal from '../../components/SwapTokensModal';
+import BuySellLayout from '../../shared/BuySellLayout';
+import ModalWindow from '../../shared/ModalWindow';
 
 export default function SellPage() {
     const defaultData = [
@@ -9,7 +9,7 @@ export default function SellPage() {
         { id: 2, content: '50%' },
         { id: 3, content: '75%' },
         { id: 4, content: 'Max' }
-    ]
+    ];
 
     return (
         <>
@@ -19,9 +19,8 @@ export default function SellPage() {
             </main>
 
             <ModalWindow>
-                <SwapModalContent />
+                <SwapTokensModal />
             </ModalWindow>
         </>
-    )
+    );
 }
-

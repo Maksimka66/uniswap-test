@@ -1,4 +1,4 @@
-import type { IDropDownIcon } from '../interfaces/IDropDownIcon/IDropDownIcon'
+import type { IDropDownIcon } from '../interfaces/IDropDownIcon/IDropDownIcon';
 
 export default function DropDownIcon({ color, width, height }: IDropDownIcon) {
     return (
@@ -8,11 +8,12 @@ export default function DropDownIcon({ color, width, height }: IDropDownIcon) {
             viewBox='0 0 13 12'
             fill='none'
             xmlns='http://www.w3.org/2000/svg'
+            className='transition-transform ease-in-out duration-300 hover:rotate-360'
         >
             <path
                 d='M6.08797 8.40005C5.73282 8.40005 5.37768 8.26505 5.10878 8.00005L1.80086 4.74007C1.65372 4.59507 1.65372 4.35507 1.80086 4.21007C1.94799 4.06507 2.19152 4.06507 2.33865 4.21007L5.64658 7.47005C5.8901 7.71005 6.28584 7.71005 6.52937 7.47005L9.83731 4.21007C9.98444 4.06507 10.228 4.06507 10.3751 4.21007C10.5222 4.35507 10.5222 4.59507 10.3751 4.74007L7.06716 8.00005C6.79827 8.26505 6.44312 8.40005 6.08797 8.40005Z'
                 fill={color}
             />
         </svg>
-    )
+    );
 }

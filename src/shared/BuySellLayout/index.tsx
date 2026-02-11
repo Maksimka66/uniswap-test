@@ -1,28 +1,28 @@
-import { useId, useState, type ChangeEvent } from 'react'
-import { useSelector } from 'react-redux'
+import { useId, useState, type ChangeEvent } from 'react';
+import { useSelector } from 'react-redux';
 // import { useDebounce } from 'use-debounce'
-import numeral from 'numeral'
+import numeral from 'numeral';
 // import DefaultAmountButton from '../DefaultAmountButton'
-import Layout from '../Layout'
-import SelectTokenButton from '../SelectTokenButton'
-import ConnectButton from '../ConnectButton'
-import SwitchIcon from '../../icons/SwitchIcon'
-import { selectAddress, selectSellCoin } from '../../store/slice'
-import type { IBuySellLayout } from '../../interfaces/IBuySellLayout/IBuySellLayout'
+import Layout from '../Layout';
+import SelectTokenButton from '../SelectTokenButton';
+import ConnectButton from '../ConnectButton';
+import SwitchIcon from '../../icons/SwitchIcon';
+import { selectAddress, selectSellCoin } from '../../store/slice';
+import type { IBuySellLayout } from '../../interfaces/IBuySellLayout/IBuySellLayout';
 
 export default function BuySellLayout({ pageLabel, data }: IBuySellLayout) {
-    const [amount, setAmount] = useState('')
+    const [amount, setAmount] = useState('');
     // const [coinPrice, setCoinPrice] = useState(0)
 
-    const [swithed, setSwitched] = useState(false)
+    const [swithed, setSwitched] = useState(false);
 
     // const [debouncedAmount] = useDebounce(amount, 1000)
 
-    const id = useId()
+    const id = useId();
 
-    const address = useSelector(selectAddress)
+    const address = useSelector(selectAddress);
     // const allCoins = useSelector(selectAllCoins)
-    const coin = useSelector(selectSellCoin)
+    const coin = useSelector(selectSellCoin);
 
     // useEffect(() => {
     //     if (coin) {
@@ -47,9 +47,9 @@ export default function BuySellLayout({ pageLabel, data }: IBuySellLayout) {
     // }
 
     const handleSwitch = () => {
-        setSwitched(!swithed)
-        console.log(swithed)
-    }
+        setSwitched(!swithed);
+        console.log(swithed);
+    };
 
     return (
         <div className='w-full flex flex-col items-center gap-2'>
@@ -113,7 +113,7 @@ export default function BuySellLayout({ pageLabel, data }: IBuySellLayout) {
                 className='w-1/4 p-4 rounded-2xl'
             />
             <ConnectButton
-                className='w-1/4 py-4 bg-[#FFF1F2] text-[#F43F5E] text-[18px] leading-6'
+                className='w-1/4 py-4 bg-[#FFF1F2] text-[#F43F5E] text-[18px] leading-6 cursor-pointer transition-colors ease-in-out duration-300 hover:bg-[#cd7ee7] hover:text-[#000080]'
                 disabled={!address || !amount ? true : false}
             >
                 {!address ? (
@@ -125,6 +125,5 @@ export default function BuySellLayout({ pageLabel, data }: IBuySellLayout) {
                 )}
             </ConnectButton>
         </div>
-    )
+    );
 }
-
