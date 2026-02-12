@@ -239,10 +239,10 @@ export default function Exchanger() {
             </div>
             {address ? (
                 <button
-                    className='rounded-[10px] font-medium font-dm w-full py-4 bg-[#FFF1F2] text-[#F43F5E] text-[18px] leading-6'
+                    className='cursor-pointer rounded-[10px] font-medium font-dm w-full py-4 bg-[#FFF1F2] text-[#F43F5E] text-[18px] leading-6 transition-colors ease-in-out duration-300 hover:bg-[#e8c6f5] hover:text-[#ff37c7]'
                     onClick={swap}
                 >
-                    Add funds to swap
+                    Swap tokens
                 </button>
             ) : (
                 <ConnectButton className='w-full py-4 bg-[#FFF1F2] text-[#F43F5E] text-[18px] leading-6 cursor-pointer transition-colors ease-in-out duration-300 hover:bg-[#e8c6f5] hover:text-[#ff37c7]'>

@@ -27,7 +27,17 @@ export default function Header() {
             <div className='flex items-center gap-2'>
                 {address ? (
                     <>
-                        <span>{address}</span>
+                        <div>
+                            <span className='text-[16px] text-[#000000] leading-5 font-medium font-dm'>
+                                {address.substring(0, 6)}
+                            </span>
+                            <span className='text-[16px] text-[#000000] leading-5 font-medium font-dm tracking-wide'>
+                                ...
+                            </span>
+                            <span className='text-[16px] text-[#000000] leading-5 font-medium font-dm'>
+                                {address.substring(38)}
+                            </span>
+                        </div>
                         <button
                             className='py-2 px-5 bg-linear-to-t from-[#F43F5E] to-[#FDA4AF] text-[16px] text-white leading-5 rounded-[10px] font-medium font-dm cursor-pointer transition-colors ease-in-out duration-300 hover:bg-linear-to-t hover:from-[#8ae77e] hover:to-[#76c587] hover:text-[#F43F5E]'
                             onClick={handleClick}

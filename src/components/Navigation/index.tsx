@@ -9,7 +9,7 @@ export default function Navigation({ links }: INav) {
         <nav className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2'>
             <ul className='flex gap-4'>
                 {links.map((link: ILinks) => (
-                    <li key={link.id}>
+                    <li key={link.id} className='rounded-full bg-[#dfe4df] px-5 py-2'>
                         <NavLink
                             to={link.to}
                             className={clsx(

@@ -4,6 +4,7 @@ import { modalWindowToogle, selectAllCoins, setCurrentCoin } from '../../store/s
 import InputFilter from '../InputFilter';
 import CloseButton from '../../shared/CloseButton/CloseButton';
 import type { IToken } from '../../interfaces/ITokens/ITokens';
+import PaginationButton from '../../shared/PaginationButton';
 
 export default function SwapTokensModal() {
     const [tokens, setTokens] = useState<IToken[]>([]);
@@ -64,7 +65,7 @@ export default function SwapTokensModal() {
                         {tokens.map((token: IToken, i) => (
                             <li key={i} className='py-0.5'>
                                 <button
-                                    className='w-full flex gap-4 items-center transition duration-300 ease-in-out hover:bg-[#d4d9e1] p-2 rounded-2xl'
+                                    className='w-full flex gap-4 items-center transition duration-300 ease-in-out hover:bg-[#d4d9e1] p-2 rounded-2xl cursor-pointer'
                                     onClick={() => applyCoin(token.address)}
                                 >
                                     <img
@@ -84,12 +85,11 @@ export default function SwapTokensModal() {
                             </li>
                         ))}
                     </ul>
-                    <button
-                        className='block w-1/2 mx-auto mb-6 px-1 py-2 rounded-full bg-[#310062] font-dm font-medium text-[#ffffff] cursor-pointer transition-colors ease-in-out duration-300 hover:bg-[#cd7ee7] hover:text-[#000080]'
+
+                    <PaginationButton
+                        isAble={tokens.length !== coins.length ? true : false}
                         onClick={getMoreTokens}
-                    >
-                        More tokens
-                    </button>
+                    />
                 </>
             ) : (
                 <span className='font-dm text-[16px] text-red-600 pl-2'>
