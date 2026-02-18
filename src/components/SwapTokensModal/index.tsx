@@ -1,52 +1,52 @@
-import { useEffect, useState, type ChangeEvent } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { modalWindowToogle, selectAllCoins, setCurrentCoin } from '../../store/slice';
-import InputFilter from '../InputFilter';
-import CloseButton from '../../shared/CloseButton/CloseButton';
-import type { IToken } from '../../interfaces/ITokens/ITokens';
-import PaginationButton from '../../shared/PaginationButton';
+import { useEffect, useState, type ChangeEvent } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { modalWindowToogle, selectAllCoins, setCurrentCoin } from '../../store/slice'
+import InputFilter from '../InputFilter'
+import CloseButton from '../../shared/CloseButton/CloseButton'
+import type { IToken } from '../../interfaces/ITokens/ITokens'
+import PaginationButton from '../../shared/PaginationButton'
 
 export default function SwapTokensModal() {
-    const [tokens, setTokens] = useState<IToken[]>([]);
+    const [tokens, setTokens] = useState<IToken[]>([])
 
-    const dispatch = useDispatch();
+    const dispatch = useDispatch()
 
-    const coins = useSelector(selectAllCoins);
+    const coins = useSelector(selectAllCoins)
 
     useEffect(() => {
-        setTokens(coins.slice(0, 10));
-    }, [coins]);
+        setTokens(coins.slice(0, 10))
+    }, [coins])
 
     const applyCoin = (address: string) => {
-        const currentCoin = tokens.find((token: IToken) => address === token.address);
+        const currentCoin = tokens.find((token: IToken) => address === token.address)
 
         if (currentCoin) {
-            dispatch(setCurrentCoin(currentCoin));
-            dispatch(modalWindowToogle(false));
+            dispatch(setCurrentCoin(currentCoin))
+            dispatch(modalWindowToogle(false))
         }
-    };
+    }
 
     const getMoreTokens = () => {
-        setTokens([...tokens, ...coins.slice(tokens.length, tokens.length + 10)]);
-    };
+        setTokens([...tokens, ...coins.slice(tokens.length, tokens.length + 10)])
+    }
 
     const handleFilter = (e: ChangeEvent) => {
-        const value = (e.target as HTMLInputElement).value;
+        const value = (e.target as HTMLInputElement).value
 
         if (value === ''.trim()) {
-            setTokens(tokens);
+            setTokens(tokens)
 
-            return;
+            return
         }
 
         const filteredCoins = coins.filter(
             (coin) =>
                 coin.name.toLowerCase().includes(value.toLowerCase()) ||
                 coin.symbol.toLowerCase().includes(value.toLowerCase())
-        );
+        )
 
-        setTokens(filteredCoins);
-    };
+        setTokens(filteredCoins)
+    }
 
     return (
         <div className='relative'>
@@ -97,5 +97,5 @@ export default function SwapTokensModal() {
                 </span>
             )}
         </div>
-    );
+    )
 }

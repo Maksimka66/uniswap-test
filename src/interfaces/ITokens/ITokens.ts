@@ -25,7 +25,7 @@ export interface IToken {
     address: string
     chainId: number
     decimals: number
-    extensions: {
+    extensions?: {
         bridgeInfo: {
             10?: ITokenAddress
             56?: ITokenAddress
@@ -39,5 +39,5 @@ export interface IToken {
     logoURI: string
     name: string
     symbol: string
+    usd: number
 }
-

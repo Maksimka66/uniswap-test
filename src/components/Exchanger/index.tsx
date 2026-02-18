@@ -1,14 +1,15 @@
-import { useEffect, useState, type ChangeEvent } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { useDebounce } from 'use-debounce';
-import numeral from 'numeral';
-import ArrowDownIcon from '../../icons/ArrowDownIcon';
-import SettingsIcon from '../../icons/SettingsIcon';
-import InputWrapper from '../../shared/InputWrapper';
-import Layout from '../../shared/Layout';
-import ConnectButton from '../../shared/ConnectButton';
-import SelectTokenButton from '../../shared/SelectTokenButton';
-import Loader from '../../shared/Loader';
+import { useEffect, useState, type ChangeEvent } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { useDebounce } from 'use-debounce'
+import { toast } from 'react-toastify'
+import numeral from 'numeral'
+import ArrowDownIcon from '../../icons/ArrowDownIcon'
+import SettingsIcon from '../../icons/SettingsIcon'
+import InputWrapper from '../../shared/InputWrapper'
+import Layout from '../../shared/Layout'
+import ConnectButton from '../../shared/ConnectButton'
+import SelectTokenButton from '../../shared/SelectTokenButton'
+import Loader from '../../shared/Loader'
 import {
     loaderToogle,
     selectAddress,
@@ -18,112 +19,108 @@ import {
     selectSellCoin,
     setButtonId,
     setCurrentCoin
-} from '../../store/slice';
-import { getMarketData } from '../../api/coinGeckoApi';
-import { swapTokens } from '../../api/uniswapTrader';
+} from '../../store/slice'
+import { swapTokens } from '../../api/uniswapTrader'
 
 export default function Exchanger() {
-    const [fieldSell, setFieldSell] = useState('');
-    const [fieldBuy, setFieldBuy] = useState('');
-    const [tokenSellPrice, setTokenSellPrice] = useState(0);
-    const [tokenBuyPrice, setTokenBuyPrice] = useState(0);
+    const [fieldSell, setFieldSell] = useState('')
+    const [fieldBuy, setFieldBuy] = useState('')
+    const [tokenSellPrice, setTokenSellPrice] = useState(0)
+    const [tokenBuyPrice, setTokenBuyPrice] = useState(0)
 
-    const [fieldSellValue] = useDebounce(fieldSell, 1000);
-    const [fieldBuyValue] = useDebounce(fieldBuy, 1000);
+    const [fieldSellValue] = useDebounce(fieldSell, 1000)
+    const [fieldBuyValue] = useDebounce(fieldBuy, 1000)
 
-    const dispatch = useDispatch();
+    const dispatch = useDispatch()
 
-    const address = useSelector(selectAddress);
-    const buttonId = useSelector(selectButtonId);
-    const tokenSell = useSelector(selectSellCoin);
-    const tokenBuy = useSelector(selectBuyCoin);
-    const loader = useSelector(selectLoader);
+    const address = useSelector(selectAddress)
+    const buttonId = useSelector(selectButtonId)
+    const tokenSell = useSelector(selectSellCoin)
+    const tokenBuy = useSelector(selectBuyCoin)
+    const loader = useSelector(selectLoader)
 
     useEffect(() => {
         if (tokenSell) {
             const getTokenSellPrice = async () => {
                 try {
-                    dispatch(loaderToogle(true));
+                    dispatch(loaderToogle(true))
 
-                    const address = tokenSell.address.toLowerCase();
+                    // const a = await getTokens()
+                    // console.log(a)
 
-                    const res = await getMarketData(address);
+                    // console.log(a.tokens.find((token) => token.symbol === 'USDT'))
 
-                    if (res) {
-                        setTokenSellPrice(res[address].usd);
-                    }
+                    // const address = tokenSell.address.toLowerCase()
+
+                    // const res = await getMarketData(address)
+
+                    setTokenSellPrice(tokenSell.usd)
                 } catch (e) {
                     if (e instanceof Error) {
-                        console.log(e.message);
+                        console.log(e.message)
                     }
                 } finally {
-                    dispatch(loaderToogle(false));
+                    dispatch(loaderToogle(false))
                 }
-            };
+            }
 
-            getTokenSellPrice();
+            getTokenSellPrice()
         }
-    }, [dispatch, tokenSell]);
+    }, [dispatch, tokenSell, tokenBuy])
 
     useEffect(() => {
         if (tokenBuy) {
             const getTokenBuyPrice = async () => {
                 try {
-                    dispatch(loaderToogle(true));
+                    dispatch(loaderToogle(true))
 
-                    const address = tokenBuy.address.toLowerCase();
-
-                    const res = await getMarketData(address);
-
-                    if (res) {
-                        setTokenBuyPrice(res[address].usd);
-                    }
+                    setTokenBuyPrice(tokenBuy.usd)
                 } catch (e) {
                     if (e instanceof Error) {
-                        console.log(e.message);
+                        console.log(e.message)
                     }
                 } finally {
-                    dispatch(loaderToogle(false));
+                    dispatch(loaderToogle(false))
                 }
-            };
+            }
 
-            getTokenBuyPrice();
+            getTokenBuyPrice()
         }
-    }, [dispatch, tokenBuy]);
+    }, [dispatch, tokenSell, tokenBuy])
 
     function calculatePrice(value: string, coin: number) {
         if (coin) {
             return numeral(+value * coin)
                 .format('($0.00a)')
-                .toUpperCase();
+                .toUpperCase()
         } else {
-            return numeral(0).format('($0.00a)');
+            return numeral(0).format('($0.00a)')
         }
     }
 
     function toogleStates() {
         if (buttonId === 'sell') {
-            const previousCoin = tokenSell;
-            const previousFieldValue = fieldSell;
+            const previousCoin = tokenSell
+            const previousFieldValue = fieldSell
 
-            dispatch(setCurrentCoin(tokenBuy));
-            dispatch(setButtonId('buy'));
-            dispatch(setCurrentCoin(previousCoin));
+            dispatch(setCurrentCoin(tokenBuy))
+            dispatch(setButtonId('buy'))
+            dispatch(setCurrentCoin(previousCoin))
 
-            setFieldBuy(previousFieldValue);
-            setFieldSell(fieldBuy);
+            setFieldBuy(previousFieldValue)
+            setFieldSell(fieldBuy)
         }
 
         if (buttonId === 'buy') {
-            const previousCoin = tokenBuy;
-            const previousFieldValue = fieldBuy;
+            const previousCoin = tokenBuy
+            const previousFieldValue = fieldBuy
 
-            dispatch(setCurrentCoin(tokenSell));
-            dispatch(setButtonId('sell'));
-            dispatch(setCurrentCoin(previousCoin));
+            dispatch(setCurrentCoin(tokenSell))
+            dispatch(setButtonId('sell'))
+            dispatch(setCurrentCoin(previousCoin))
 
-            setFieldSell(previousFieldValue);
-            setFieldBuy(fieldSell);
+            setFieldSell(previousFieldValue)
+            setFieldBuy(fieldSell)
         }
     }
 
@@ -133,57 +130,69 @@ export default function Exchanger() {
             .replace(/[^\d.,]/g, '')
             .replace(/([.,])(.*)\1/g, '$1$2')
             .replace(/^0+(?=\d)/, '')
-            .replace(/^[.,]/, '');
+            .replace(/^[.,]/, '')
 
         if (e.target.id === 'sell') {
-            setFieldSell(value);
+            setFieldSell(value)
 
             if (tokenBuyPrice) {
-                const calculatedToken = ((+value * +tokenSellPrice) / +tokenBuyPrice).toFixed(3);
+                const calculatedToken = ((+value * +tokenSellPrice) / +tokenBuyPrice).toFixed(3)
 
                 if (+calculatedToken) {
-                    setFieldBuy(calculatedToken);
+                    setFieldBuy(calculatedToken)
                 } else {
-                    setFieldBuy('');
+                    setFieldBuy('')
                 }
             }
         }
 
         if (e.target.id === 'buy') {
-            setFieldBuy(value);
+            setFieldBuy(value)
 
             if (tokenSellPrice) {
-                const calculatedToken = ((+value * +tokenBuyPrice) / +tokenSellPrice).toFixed(3);
+                const calculatedToken = ((+value * +tokenBuyPrice) / +tokenSellPrice).toFixed(3)
 
                 if (+calculatedToken) {
-                    setFieldSell(calculatedToken);
+                    setFieldSell(calculatedToken)
                 } else {
-                    setFieldSell('');
+                    setFieldSell('')
                 }
             }
         }
-    };
+    }
 
     const swap = async () => {
         try {
             if (tokenSell && tokenBuy && fieldSell) {
-                dispatch(loaderToogle(true));
+                dispatch(loaderToogle(true))
 
-                const res = await swapTokens(fieldSell, tokenSell, tokenBuy);
+                const res = await swapTokens(fieldSell, tokenSell, tokenBuy)
 
-                console.log(res);
+                if (res) {
+                    toast.success('Your transaction has been successful! Please check your wallet.')
+
+                    setFieldSell('')
+                    setFieldBuy('')
+
+                    dispatch(setButtonId(null))
+                    dispatch(setCurrentCoin(null))
+                }
+            } else {
+                toast.error(
+                    'You need to choose tokens and enter the amount you want to swap first!'
+                )
             }
         } catch (e) {
             if (e instanceof Error) {
-                console.log(e.message);
+                console.error(e)
             }
         } finally {
-            dispatch(loaderToogle(false));
+            dispatch(loaderToogle(false))
         }
-    };
+    }
 
     if (loader) {
-        return <Loader />;
+        return <Loader />
     }
 
     return (
@@ -250,5 +259,5 @@ export default function Exchanger() {
                 </ConnectButton>
             )}
         </Layout>
-    );
+    )
 }

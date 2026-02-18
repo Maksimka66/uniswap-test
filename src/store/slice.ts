@@ -56,6 +56,11 @@ const keySlice = createSlice({
             state.filteredCoins = payload
         },
         setCurrentCoin(state, { payload }) {
+            if (state.buttonId === null) {
+                state.sellCoin = null
+                state.buyCoin = null
+            }
+
             if (state.buttonId === 'sell') {
                 if (state.buyCoin?.address === payload.address) {
                     state.sellCoin = payload
@@ -103,4 +108,3 @@ export const {
 } = keySlice.selectors
 
 export default keySlice.reducer
-

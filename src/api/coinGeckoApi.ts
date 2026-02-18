@@ -32,7 +32,7 @@ export const getMarketData = async (contractAddress: string) => {
         return res.data
     } catch (e) {
         if (e instanceof Error) {
-            console.log(e.message)
+            console.error(e)
         }
     }
 }
@@ -48,4 +48,3 @@ export const getCurrentCoin = async (id: string) => {
         }
     }
 }
-

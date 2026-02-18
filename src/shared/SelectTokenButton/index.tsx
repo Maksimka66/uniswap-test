@@ -1,21 +1,21 @@
-import type { MouseEventHandler } from 'react';
-import { useDispatch } from 'react-redux';
-import clsx from 'clsx';
-import DropDownIcon from '../../icons/DropDownIcon';
-import { modalWindowToogle, setButtonId } from '../../store/slice';
-import type { ISelectTokenButton } from '../../interfaces/ISelectTokenButton/ISelectTokenButton';
+import type { MouseEventHandler } from 'react'
+import { useDispatch } from 'react-redux'
+import clsx from 'clsx'
+import DropDownIcon from '../../icons/DropDownIcon'
+import { modalWindowToogle, setButtonId } from '../../store/slice'
+import type { ISelectTokenButton } from '../../interfaces/ISelectTokenButton/ISelectTokenButton'
 
 export default function SelectTokenButton({
     currentCoin,
     className,
     buttonId
 }: ISelectTokenButton) {
-    const dispatch = useDispatch();
+    const dispatch = useDispatch()
 
     const fetchCoinsOpen: MouseEventHandler<HTMLButtonElement> = (e) => {
-        dispatch(setButtonId(e.currentTarget.id));
-        dispatch(modalWindowToogle(true));
-    };
+        dispatch(setButtonId(e.currentTarget.id))
+        dispatch(modalWindowToogle(true))
+    }
 
     return (
         <button
@@ -26,7 +26,7 @@ export default function SelectTokenButton({
                           className
                       )
                     : clsx(
-                          'text-white bg-linear-to-t from-[#F43F5E] to-[#FDA4AF] hover:bg-linear-to-b hover:from-[#ecd23f] hover:to-[#ec4863] hover:text-[#048000]',
+                          'text-white bg-linear-to-t from-[#F43F5E] to-[#FDA4AF] hover:bg-linear-to-b hover:from-[#6d3fec] hover:to-[#f0ec0e] hover:text-[#f19591]',
                           className
                       )
             }`}
@@ -54,5 +54,5 @@ export default function SelectTokenButton({
                 </>
             )}
         </button>
-    );
+    )
 }

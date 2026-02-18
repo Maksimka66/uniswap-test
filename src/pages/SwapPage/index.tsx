@@ -1,12 +1,11 @@
+import { useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import Exchanger from '../../components/Exchanger'
 import Header from '../../components/Header'
 import ModalWindow from '../../shared/ModalWindow'
 import SwapTokensModal from '../../components/SwapTokensModal'
-import { useEffect } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { getTokens } from '../../api/uniswapApi'
 import { loaderToogle, selectAllCoins, setCoins, setFilteredCoins } from '../../store/slice'
-import type { IToken } from '../../interfaces/ITokens/ITokens'
+import { sepoliaTokensData } from '../../api/sepoliaTokensData'
 
 export default function SwapPage() {
     const dispatch = useDispatch()
@@ -19,12 +18,8 @@ export default function SwapPage() {
                 try {
                     dispatch(loaderToogle(true))
 
-                    const res = await getTokens()
-
-                    const ethereumTokens = res.tokens.filter((token: IToken) => token.chainId === 1)
-
-                    dispatch(setCoins(ethereumTokens))
-                    dispatch(setFilteredCoins(ethereumTokens))
+                    dispatch(setCoins(sepoliaTokensData))
+                    dispatch(setFilteredCoins(sepoliaTokensData))
                 } catch (e) {
                     if (e instanceof Error) {
                         console.log(e.message)
