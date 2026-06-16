@@ -1,16 +1,14 @@
 import axios from 'axios'
 
-// axios.defaults.baseURL = 'https://api.coingecko.com/api/v3'
+axios.defaults.baseURL = 'https://api.coingecko.com/api/v3'
 
-// axios.defaults.headers.common['x-cg-demo-api-key'] = import.meta.env.VITE_COINGECKO_API_KEY
+axios.defaults.headers.common['x-cg-demo-api-key'] = import.meta.env.VITE_COINGECKO_API_KEY
 
 export const getAllCoins = async () => {
     try {
-        const res = await axios.get(
-            'https://api.coingecko.com/api/v3/coins/list?include_platform=true'
-        )
+        const res = await axios.get('/token_lists/ethereum/all.json')
 
-        return res.data
+        return res.data.tokens
     } catch (e) {
         if (e instanceof Error) {
             console.log(e.message)
@@ -21,12 +19,7 @@ export const getAllCoins = async () => {
 export const getMarketData = async (contractAddress: string) => {
     try {
         const res = await axios.get(
-            `https://api.coingecko.com/api/v3/simple/token_price/ethereum?contract_addresses=${contractAddress}&vs_currencies=usd`
-            // {
-            //     headers: {
-            //         'x-cg-demo-api-key': import.meta.env.VITE_COINGECKO_API_KEY
-            //     }
-            // }
+            `/simple/token_price/ethereum?contract_addresses=${contractAddress}&vs_currencies=usd`
         )
 
         return res.data
@@ -37,9 +30,9 @@ export const getMarketData = async (contractAddress: string) => {
     }
 }
 
-export const getCurrentCoin = async (id: string) => {
+export const getCurrentCoin = async (address: string) => {
     try {
-        const res = await axios.get(`/coins/${id}`)
+        const res = await axios.get(`/onchain/networks/eth/tokens/${address}`)
 
         return res.data
     } catch (e) {

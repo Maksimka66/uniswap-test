@@ -22,6 +22,11 @@ export interface IParams {
 }
 
 export interface IToken {
+    data: {
+        attributes: {
+            price_usd: string
+        }
+    }
     address: string
     chainId: number
     decimals: number

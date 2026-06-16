@@ -21,6 +21,7 @@ import {
     setCurrentCoin
 } from '../../store/slice'
 import { swapTokens } from '../../api/uniswapTrader'
+import { getCurrentCoin } from '../../api/coinGeckoApi'
 
 export default function Exchanger() {
     const [fieldSell, setFieldSell] = useState('')
@@ -45,16 +46,11 @@ export default function Exchanger() {
                 try {
                     dispatch(loaderToogle(true))
 
-                    // const a = await getTokens()
-                    // console.log(a)
+                    const currentCoin = await getCurrentCoin(tokenSell.address)
 
-                    // console.log(a.tokens.find((token) => token.symbol === 'USDT'))
-
-                    // const address = tokenSell.address.toLowerCase()
-
-                    // const res = await getMarketData(address)
-
-                    setTokenSellPrice(tokenSell.usd)
+                    if (currentCoin) {
+                        setTokenSellPrice(+tokenSell.data.attributes.price_usd)
+                    }
                 } catch (e) {
                     if (e instanceof Error) {
                         console.log(e.message)
@@ -66,7 +62,7 @@ export default function Exchanger() {
 
             getTokenSellPrice()
         }
-    }, [dispatch, tokenSell, tokenBuy])
+    }, [dispatch, tokenSell])
 
     useEffect(() => {
         if (tokenBuy) {
@@ -74,7 +70,11 @@ export default function Exchanger() {
                 try {
                     dispatch(loaderToogle(true))
 
-                    setTokenBuyPrice(tokenBuy.usd)
+                    const currentCoin = await getCurrentCoin(tokenBuy.address)
+
+                    if (currentCoin) {
+                        setTokenBuyPrice(+tokenBuy.data.attributes.price_usd)
+                    }
                 } catch (e) {
                     if (e instanceof Error) {
                         console.log(e.message)
@@ -86,7 +86,7 @@ export default function Exchanger() {
 
             getTokenBuyPrice()
         }
-    }, [dispatch, tokenSell, tokenBuy])
+    }, [dispatch, tokenBuy])
 
     function calculatePrice(value: string, coin: number) {
         if (coin) {

@@ -5,7 +5,7 @@ import Header from '../../components/Header'
 import ModalWindow from '../../shared/ModalWindow'
 import SwapTokensModal from '../../components/SwapTokensModal'
 import { loaderToogle, selectAllCoins, setCoins, setFilteredCoins } from '../../store/slice'
-import { sepoliaTokensData } from '../../api/sepoliaTokensData'
+import { getAllCoins } from '../../api/coinGeckoApi'
 
 export default function SwapPage() {
     const dispatch = useDispatch()
@@ -18,8 +18,12 @@ export default function SwapPage() {
                 try {
                     dispatch(loaderToogle(true))
 
-                    dispatch(setCoins(sepoliaTokensData))
-                    dispatch(setFilteredCoins(sepoliaTokensData))
+                    const fetchedCoins = await getAllCoins()
+
+                    if (fetchedCoins) {
+                        dispatch(setCoins(fetchedCoins))
+                        dispatch(setFilteredCoins(fetchedCoins))
+                    }
                 } catch (e) {
                     if (e instanceof Error) {
                         console.log(e.message)
